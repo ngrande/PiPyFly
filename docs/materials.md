@@ -3,7 +3,6 @@
 * RaspberryPi 3
 * 4x Motors
 * 4x ESC
-* Gyroscope
-* Accelerometer
+* Gyroscope (built in Accelerometer)
 * Battery (Li-Ion Polymer)
 * Frame

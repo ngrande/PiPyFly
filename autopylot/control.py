@@ -36,6 +36,36 @@ class Motor():
                      attributes: {!s}'.format(self.__class__.__name__,
                                               self.__dict__))
 
+    def verify_motor_started(func):
+        def wrapper(self, args):
+            if not self._started:
+                logging.error("Motor was not started properly before sending \
+                              an event. Please verify your code and usage of \
+                              the Motor class. Before throttling or simliar \
+                              one should send the start signal.")
+                raise Exception("Motor was not started (no start signal sent).\
+                                This could lead to damage of the hardware / \
+                                electronics or your environment.")
+            else:
+                return func(args)
+
+    def check_throttle_change(func):
+        """ Wrapper to warn the user if the throttle change is too harsh
+        / fast / could damge the motors """
+        def wrapper(self, args):
+            before_change = self.current_throttle
+            func(args)
+            after_change = self.current_throttle
+            total_change = abs(before_change - after_change)
+            total_change_perc = total_change * 100 / (self.max_throttle -
+                                                      self.min_throttle)
+            if total_change_perc >= 33:
+                logging.warning("Detected a change of throttle from {!s} to \
+                                {!s} ({!s}%). Please verify the usage and \
+                                check if this could damage your motors."
+                                .format(before_change, after_change,
+                                        total_change_perc))
+
     def is_started(self):
         return self._started
 
@@ -74,6 +104,7 @@ class Motor():
                                                       self.pin))
             return False
 
+    @verify_motor_started
     def send_throttle_adjustment(self, throttle_add):
         """ increases / decreases the current throttle by the
         throttle_add value """
@@ -85,6 +116,8 @@ class Motor():
         res = self.send_throttle(new_total_throttle)
         return res
 
+    @verify_motor_started
+    @check_throttle_change
     def send_throttle(self, throttle):
         """ sets the current throttle to the new value """
         if throttle < self.min_throttle:

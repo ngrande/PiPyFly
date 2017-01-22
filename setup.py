@@ -8,7 +8,7 @@ def load_file_content(filename):
     return open(os.path.join(os.path.dirname(__file__), filename)).read()
 
 setup(
-    name="autopylot",
+    name="PiPyFly",
     version="0.0.1",
     author="Niclas Grande",
     author_email="devlup@outlook.com",

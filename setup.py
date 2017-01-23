@@ -19,6 +19,7 @@ setup(
     packages=["autopylot", "tests"],
     long_description=load_file_content("README.md"),
     install_requires=['pigpio', 'psutil', 'mpu6050-raspberrypi'],
-    tests_require=['pigpio']
+    tests_require=['pigpio'],
+    test_suite='tests',
     # classifiers = [""]
 )

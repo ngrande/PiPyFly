@@ -1,11 +1,15 @@
 import unittest
 import os
 import sys
+import logging
+
 import pigpio
+import psutil
 
 sys.path.insert(0, os.path.abspath('..'))
 
-from autopylot import control
+import autopylot
+import autopylot.control as control
 
 
 class TestControlMotor(unittest.TestCase):
@@ -27,21 +31,81 @@ class TestControlMotor(unittest.TestCase):
         # first start should succeed
         self.assertTrue(self.motor.send_start_signal())
         # second start should not succeed because it is already started
-        self.assertTrue(self.motor.send_start_signal())
+        self.assertFalse(self.motor.send_start_signal())
 
     def test_send_stop_signal(self):
         """ Tests the stop signal sending """
-        # motor = self._create_motor_object()
+        # we have to start the motor before sending stop signal...
+        self.assertTrue(self.motor.send_start_signal())
         # should always succeed
         self.assertTrue(self.motor.send_stop_signal())
 
     def test_send_throttle_adjustment(self):
-        """ Tests the throttle adjustment sending """
-        # motor = self._create_motor_object()
+        """ Tests the throttle adjustment sending.
+        Will perform a motor start, an normal adjustment, a too high adjustment
+        and a too low adjustment. """
+        self.assertTrue(self.motor.send_start_signal())
         self.assertTrue(self.motor.send_throttle_adjustment(100))
         # should fail because we already sent 100 and the maximum is 1890
         # 100 + 1800 = 1900 = FAIL
-        self.assertFalse(self.motor.send_throttle_adjustment(1800))
+        # with self.assertRaises(Exception):
+        #     self.motor.send_throttle_adjustment(800)
+        # with self.assertRaises(Exception):
+        #     self.motor.send_throttle_adjustment(-200)
+        self.assertFalse(self.motor.send_throttle_adjustment(800))
+        self.assertFalse(self.motor.send_throttle_adjustment(-200))
+        # self.assertTrue(self.motor.send_throttle_adjustment(760))
+
+    def test_send_throttle(self):
+        """ Tests the throttle sending.
+        Will perform a motor start, an normal throttle and three failing
+        throttle values (negative value, zero and much too high) """
+
+        self.assertTrue(self.motor.send_start_signal())
+        self.assertTrue(self.motor.send_throttle(1200))
+        self.assertFalse(self.motor.send_throttle(-1))
+        self.assertFalse(self.motor.send_throttle(0))
+        self.assertFalse(self.motor.send_throttle(99999))
+
+    def test_decorator_check_throttle_change(self):
+        """ Tests the decorator which checks the throttle change and should
+        write a warning in the log file - stating that the change could
+        be harmful """
+
+        self.assertTrue(self.motor.send_start_signal())
+        # from 0 to 100
+        self.assertTrue(self.motor.send_throttle(1860))
+        # TODO: add assert for logging
+        # self.assertTrue(autopylot.logging.)
+        # with self.assertLogs(autopylot.logging.getLogger(autopylot.__name__),
+        # logging.WARNING):
+        #     self.motor.send_throttle(1860)
+
+
+class TestControlQuadcopter(unittest.TestCase):
+    """ Class to test the quadcopter control class """
+    def setUp(self):
+        self.quadcopter = control.Quadcopter()
+
+    def tearDown(self):
+        self.quadcopter.shutdown()
+        self.quadcopter = None
+
+    # def test_auto_daemon_spawn(self):
+    #     """ Tests if the Quadcopter automatically spawns the pigpiod daemon
+    #     process """
+    #     # first kill the pigpiod if exists
+    #     daemon_name = "pigpiod"
+    #     daemon_pid = None
+    #     for pid in psutil.pids():
+    #         if psutil.Process(pid).name() == daemon_name:
+    #             daemon_pid = pid
+    #             break
+    #     os.kill(daemon_pid, 15)
+    #     quad = control.Quadcopter()
+    #     daemon_running = any([psutil.Process(pid).name() == daemon_name
+    #                           for pid in psutil.pids()])
+    #     self.assertTrue(daemon_running)
 
 
 if __name__ == '__main__':

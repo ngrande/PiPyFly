@@ -1,17 +1,25 @@
 """ Module to provide easy access to the Quadcopter.
 All pins here are referenced by the BCM (Broadcom SOC channel) mapping """
 
+# standard modules
+import os
 import time
 import pigpio
 import logging
+import subprocess
+
+# pip installed modules
+import psutil
+
+# my modules
 from . import config
 
 
 ################################################
 # LIST OF TODOs                                #
 ################################################
-# TODO: add checks if motor is started or NOT! #
-#                                              #
+# TODO: add checks if motor is started or NOT!
+# TODO:
 ################################################
 
 
@@ -22,7 +30,7 @@ class Motor():
     def __init__(self, pi, pin, start_signal, stop_signal,
                  min_throttle, max_throttle):
         if not pi:
-            logging.critical("Pi = None. Unable to control the motor")
+            logging.error("Pi = None. Unable to control the motor")
             raise Exception("Pi = None. Unable to take control over the motor")
         self.pi = pi
         self.pin = int(pin)
@@ -32,6 +40,8 @@ class Motor():
         self.max_throttle = int(max_throttle)
         self.current_throttle = 0
         self._started = False
+        # the callback return object - do not change this - it is private!
+        self._gpio_callback = None
         logging.info('Created new instance of {!s} class with following \
                      attributes: {!s}'.format(self.__class__.__name__,
                                               self.__dict__))
@@ -66,6 +76,45 @@ class Motor():
                                 .format(before_change, after_change,
                                         total_change_perc))
 
+    def _register_gpio_watchdog(self):
+        """ Registers a watchdog and callback function to the gpio pin.
+        This is used to check if the communication is stable """
+        if self._gpio_callback is not None:
+            return
+
+        def callback_func(gpio, level, tick):
+            if level == pigpio.TIMEOUT:
+                logging.warning("Timeout event triggered from watchdog on \
+                                pin: {!s} (tick: {!s}). Check the motor \
+                                responsivness or adjust the watchdog."
+                                .format(gpio, tick))
+
+        self._gpio_callback = self.pi.callback(self.pin, pigpio.EITHER_EDGE,
+                                               callback_func)
+
+        # *******************************************************
+        #
+        # set a watchdog to the pin - the servo pulsewidth should be sent
+        # periodically - so the watchdog would only trigger when there
+        # is an unexpected behavior...
+        #
+        # *******************************************************
+
+        # set watchdog to 5ms (because we need full control over the motor)
+        wd_timeout_ms = 5
+        self.pi.set_watchdog(self.pin, wd_timeout_ms)
+        logging.info("Activated a watchdog (timeout: {!s}ms) and callback for \
+                     pin: {!s}".format(wd_timeout_ms, self.pin))
+
+    def _unregister_gpio_watchdog(self):
+        """ Deactivate the watchdog and callback for the motor pin """
+        self._gpio_callback.cancel()
+        self._gpio_callback = None
+
+        self.pi.set_watchdog(self.pin, 0)
+        logging.info("Deactivated watchdog and callback for pin: {!s}"
+                     .format(self.pin))
+
     def is_started(self):
         return self._started
 
@@ -78,6 +127,7 @@ class Motor():
         try:
             self.pi.set_servo_pulsewidth(self.pin, self.start_signal)
             self._started = True
+            self._register_gpio_watchdog()
             self.current_throttle = self.start_signal
             logging.info("Successfully sent start signal ({!s}) \
                          to the pin {!s}".format(self.start_signal, self.pin))
@@ -94,6 +144,7 @@ class Motor():
         try:
             self.pi.set_servo_pulsewidth(self.pin, self.stop_signal)
             self._started = False
+            self._unregister_gpio_watchdog()
             self.current_throttle = self.stop_signal
             logging.info("Successfully sent stop signal ({!s}) \
                          to the pin {!s}".format(self.stop_signal, self.pin))
@@ -151,7 +202,48 @@ class Motor():
 class Quadcopter():
     """ Class to control the quadcopter """
     def __init__(self):
+        success = self._start_pigpio_daeomon()
+        if not success:
+            logging.error("pigpio daemon was not started successfully")
+            raise Exception("pigpiod daemon did not start properly. \
+                            Check permissions and / or if installed properly")
         self.pi = pigpio.pi()
+        if not self.pi.connected:
+            # no connection to the GPIO pins possible...
+            logging.error("Unable to connect to the GPIO pins (pigpio: {!s}). \
+                          Is the pigpiod daemon running?"
+                          .format(self.pi.__dict__))
+            raise Exception("Unable to connecto to the GPIO pins")
+
+    def _start_pigpio_daeomon(self):
+        """ Checks if the pigpiod daemon is already running and if not it
+        will be started. Returns True if the daemon was started (successfully)
+        or was already running. Otherwise False """
+        daemon_name = 'pigpiod'
+
+        def is_daemon_running():
+            daemon_running = any([psutil.Process(pid).name() == daemon_name
+                                 for pid in psutil.pids()])
+        if not daemon_running:
+            # start pigpiod
+            sample_rate = config.get_pigpiod_sample_rate()
+            subproc_command = [daemon_name, '-s', str(sample_rate)]
+            try:
+                subprocess.Popen(subproc_command)
+            except Exception as e:
+                logging.exception("Exception occurred while starting the \
+                                  pigpio daemon ({!s}): {!s}"
+                                  .format(daemon_name, e))
+                return False
+            logging.info("Started {!s} via subprocess ({!s})."
+                         .format(daemon_name, subproc_command))
+        else:
+            logging.info("{!s} was already running. No further action \
+                         required. This means we did not set the sample \
+                         rate from the .ini configuration."
+                         .format(daemon_name))
+
+        return is_daemon_running()
 
 
 class Gyroscope():

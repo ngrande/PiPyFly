@@ -18,7 +18,7 @@ setup(
     url="https://github.com/ngrande/PiPyFly",
     packages=["autopylot", "tests"],
     long_description=load_file_content("README.md"),
-    install_requires=['pigpio', 'mpu6050-raspberrypi'],
+    install_requires=['pigpio', 'psutil', 'mpu6050-raspberrypi'],
     tests_require=['pigpio']
     # classifiers = [""]
 )

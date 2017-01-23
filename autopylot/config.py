@@ -138,6 +138,11 @@ def get_log_output_file():
     return str(config['LOG']['OutputFile'])
 
 
+def get_pigpiod_sample_rate():
+    """ Returns the pigpiod sample rate (int) which should be used when
+    starting the daemon """
+    return int(config['PIGPIOD']['SampleRate'])
+
 config = configparser.ConfigParser()
 config.read(os.path.dirname(__file__) + '/config.ini')
 if len(config.sections()) == 0:

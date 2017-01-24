@@ -143,6 +143,11 @@ def get_pigpiod_sample_rate():
     starting the daemon """
     return int(config['PIGPIOD']['SampleRate'])
 
+
+def get_gyrosensor_address():
+    """ Returns a int of the hexadecimal address value """
+    return int(config['GYRO']['Address'], 16)
+
 config = configparser.ConfigParser()
 config.read(os.path.dirname(__file__) + '/config.ini')
 if len(config.sections()) == 0:

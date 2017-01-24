@@ -35,6 +35,9 @@ class TestControlMotor(unittest.TestCase):
 
     def test_send_stop_signal(self):
         """ Tests the stop signal sending """
+        # motor is not yet started - should not raise Exception or anything
+        # because it does not hurt to turn it off unncessarily often...
+        self.assertTrue(self.motor.send_stop_signal())
         # we have to start the motor before sending stop signal...
         self.assertTrue(self.motor.send_start_signal())
         # should always succeed
@@ -88,9 +91,37 @@ class TestControlQuadcopter(unittest.TestCase):
         self.quadcopter = control.Quadcopter()
 
     def tearDown(self):
-        self.quadcopter.shutdown()
+        # self.quadcopter.shutdown()
         self.quadcopter = None
 
+    def test_turn_on(self):
+        """ Tests the turn on method """
+        self.assertTrue(self.quadcopter.turn_on())
+
+    def test_turn_off(self):
+        """ Tests the turn off method """
+        self.assertTrue(self.quadcopter.turn_off())
+
+    def test_turn_on_turn_off(self):
+        """ Tests turning on and then turning off """
+        self.assertTrue(self.quadcopter.turn_on())
+        self.assertTrue(self.quadcopter.turn_off())
+
+    def test_turn_off_turn_on_turn_off(self):
+        """ Tests turning off, turning on and then off again """
+        self.assertTrue(self.quadcopter.turn_off())
+        self.assertTrue(self.quadcopter.turn_on())
+        self.assertTrue(self.quadcopter.turn_off())
+
+    def test_get_gyrotemp(self):
+        """ Tests if the gyrosensor returns valid temperature values in °C """
+        temp = round(self.quadcopter.get_gyrosensor_temp(), 0)
+        # this test should be run in a room so i expect values
+        # within "room temperature"
+        in_range = temp in range(18, 30)
+        self.assertTrue(in_range)
+
+    # ########################################################################
     # def test_auto_daemon_spawn(self):
     #     """ Tests if the Quadcopter automatically spawns the pigpiod daemon
     #     process """
@@ -106,7 +137,7 @@ class TestControlQuadcopter(unittest.TestCase):
     #     daemon_running = any([psutil.Process(pid).name() == daemon_name
     #                           for pid in psutil.pids()])
     #     self.assertTrue(daemon_running)
-
+    # ########################################################################
 
 if __name__ == '__main__':
         unittest.main()

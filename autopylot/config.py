@@ -1,3 +1,7 @@
+""" Configuration Module - autom. loads the config.ini file and checks it.
+Also sets up the loggin module so all other modules do not have to worry
+about that and can use it out of the box."""
+
 import os
 import configparser
 import logging

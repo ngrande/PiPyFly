@@ -1,0 +1,292 @@
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x7618ca90>, '_started': False, '_gpio_callback': None, 'pin': 4, 'max_throttle': 1890}
+INFO:root:Activated a watchdog (timeout: 5ms) and callback for pin: 4
+INFO:root:Successfully sent start signal (1000) to the pin 4
+INFO:root:Successfully adjusted throttle from 1000 to 1860 on pin 4
+WARNING:root:Detected a change of throttle from 1000 to 1860 (860 -> 86.0%). Please verify the usage and check if this could damage your motors.
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x760cdb70>, '_started': False, '_gpio_callback': None, 'pin': 4, 'max_throttle': 1890}
+INFO:root:Activated a watchdog (timeout: 5ms) and callback for pin: 4
+INFO:root:Successfully sent start signal (1000) to the pin 4
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x7610af10>, '_started': False, '_gpio_callback': None, 'pin': 4, 'max_throttle': 1890}
+WARNING:root:Motor on pin 4 was not started before receiving stop signal...
+INFO:root:Deactivated watchdog and callback for pin: 4
+INFO:root:Successfully sent stop signal (0) to the pin 4
+INFO:root:Activated a watchdog (timeout: 5ms) and callback for pin: 4
+INFO:root:Successfully sent start signal (1000) to the pin 4
+INFO:root:Deactivated watchdog and callback for pin: 4
+INFO:root:Successfully sent stop signal (0) to the pin 4
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x76165450>, '_started': False, '_gpio_callback': None, 'pin': 4, 'max_throttle': 1890}
+INFO:root:Activated a watchdog (timeout: 5ms) and callback for pin: 4
+INFO:root:Successfully sent start signal (1000) to the pin 4
+INFO:root:Successfully adjusted throttle from 1000 to 1200 on pin 4
+ERROR:root:Can not set throttle (-1) lower than the minimum (1068)
+ERROR:root:Can not set throttle (0) lower than the minimum (1068)
+ERROR:root:Can not set throttle higher (99999) than the maximum (1890)
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x76165db0>, '_started': False, '_gpio_callback': None, 'pin': 4, 'max_throttle': 1890}
+INFO:root:Activated a watchdog (timeout: 5ms) and callback for pin: 4
+INFO:root:Successfully sent start signal (1000) to the pin 4
+INFO:root:Sending throttle adjustment of 100 to current throttle 1000
+INFO:root:Successfully adjusted throttle from 1000 to 1100 on pin 4
+INFO:root:Sending throttle adjustment of 800 to current throttle 1100
+ERROR:root:Can not set throttle higher (1900) than the maximum (1890)
+INFO:root:Sending throttle adjustment of -200 to current throttle 1100
+ERROR:root:Can not set throttle (900) lower than the minimum (1068)
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751532844). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751532844). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751532844). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751532844). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751538894). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751538894). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751538894). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751538894). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751543919). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751543919). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751543919). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751543919). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751552919). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751552919). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751552919). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751552919). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751558994). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751558994). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751558994). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751558994). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751564194). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751564194). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751564194). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751564194). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751572019). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751572019). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751572019). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751572019). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751578119). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751578119). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751578119). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751578119). Check the motor responsivness or adjust the watchdog.
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x76165430>, '_started': False, '_gpio_callback': None, 'pin': 4, 'max_throttle': 1860}
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x76165430>, '_started': False, '_gpio_callback': None, 'pin': 17, 'max_throttle': 1860}
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x76165430>, '_started': False, '_gpio_callback': None, 'pin': 22, 'max_throttle': 1860}
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x76165430>, '_started': False, '_gpio_callback': None, 'pin': 27, 'max_throttle': 1860}
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751584269). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751584269). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751584269). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751584269). Check the motor responsivness or adjust the watchdog.
+DEBUG:root:Current gyrosensor temperature: 27.0°C
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751592069). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751592069). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751592069). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751592069). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751597094). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751597094). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751597094). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751597094). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751603169). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751603169). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751603169). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751603169). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751612119). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751612119). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751612119). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751612119). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751618169). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751618169). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751618169). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751618169). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751624269). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751624269). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751624269). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751624269). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751632044). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751632044). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751632044). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751632044). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751638119). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751638119). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751638119). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751638119). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751643319). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751643319). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751643319). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751643319). Check the motor responsivness or adjust the watchdog.
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x760cdcd0>, '_started': False, '_gpio_callback': None, 'pin': 4, 'max_throttle': 1860}
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x760cdcd0>, '_started': False, '_gpio_callback': None, 'pin': 17, 'max_throttle': 1860}
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x760cdcd0>, '_started': False, '_gpio_callback': None, 'pin': 22, 'max_throttle': 1860}
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x760cdcd0>, '_started': False, '_gpio_callback': None, 'pin': 27, 'max_throttle': 1860}
+WARNING:root:Motor on pin 22 was not started before receiving stop signal...
+INFO:root:Deactivated watchdog and callback for pin: 22
+INFO:root:Successfully sent stop signal (0) to the pin 22
+WARNING:root:Motor on pin 27 was not started before receiving stop signal...
+INFO:root:Deactivated watchdog and callback for pin: 27
+INFO:root:Successfully sent stop signal (0) to the pin 27
+WARNING:root:Motor on pin 4 was not started before receiving stop signal...
+INFO:root:Deactivated watchdog and callback for pin: 4
+INFO:root:Successfully sent stop signal (0) to the pin 4
+WARNING:root:Motor on pin 17 was not started before receiving stop signal...
+INFO:root:Deactivated watchdog and callback for pin: 17
+INFO:root:Successfully sent stop signal (0) to the pin 17
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x7618c9d0>, '_started': False, '_gpio_callback': None, 'pin': 4, 'max_throttle': 1860}
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x7618c9d0>, '_started': False, '_gpio_callback': None, 'pin': 17, 'max_throttle': 1860}
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x7618c9d0>, '_started': False, '_gpio_callback': None, 'pin': 22, 'max_throttle': 1860}
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x7618c9d0>, '_started': False, '_gpio_callback': None, 'pin': 27, 'max_throttle': 1860}
+WARNING:root:Motor on pin 22 was not started before receiving stop signal...
+INFO:root:Deactivated watchdog and callback for pin: 22
+INFO:root:Successfully sent stop signal (0) to the pin 22
+WARNING:root:Motor on pin 27 was not started before receiving stop signal...
+INFO:root:Deactivated watchdog and callback for pin: 27
+INFO:root:Successfully sent stop signal (0) to the pin 27
+WARNING:root:Motor on pin 4 was not started before receiving stop signal...
+INFO:root:Deactivated watchdog and callback for pin: 4
+INFO:root:Successfully sent stop signal (0) to the pin 4
+WARNING:root:Motor on pin 17 was not started before receiving stop signal...
+INFO:root:Deactivated watchdog and callback for pin: 17
+INFO:root:Successfully sent stop signal (0) to the pin 17
+INFO:root:Activated a watchdog (timeout: 5ms) and callback for pin: 22
+INFO:root:Successfully sent start signal (1000) to the pin 22
+INFO:root:Activated a watchdog (timeout: 5ms) and callback for pin: 27
+INFO:root:Successfully sent start signal (1000) to the pin 27
+INFO:root:Activated a watchdog (timeout: 5ms) and callback for pin: 4
+INFO:root:Successfully sent start signal (1000) to the pin 4
+INFO:root:Activated a watchdog (timeout: 5ms) and callback for pin: 17
+INFO:root:Successfully sent start signal (1000) to the pin 17
+INFO:root:Deactivated watchdog and callback for pin: 22
+INFO:root:Successfully sent stop signal (0) to the pin 22
+INFO:root:Deactivated watchdog and callback for pin: 27
+INFO:root:Successfully sent stop signal (0) to the pin 27
+INFO:root:Deactivated watchdog and callback for pin: 4
+INFO:root:Successfully sent stop signal (0) to the pin 4
+INFO:root:Deactivated watchdog and callback for pin: 17
+INFO:root:Successfully sent stop signal (0) to the pin 17
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x76165d90>, '_started': False, '_gpio_callback': None, 'pin': 4, 'max_throttle': 1860}
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x76165d90>, '_started': False, '_gpio_callback': None, 'pin': 17, 'max_throttle': 1860}
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x76165d90>, '_started': False, '_gpio_callback': None, 'pin': 22, 'max_throttle': 1860}
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x76165d90>, '_started': False, '_gpio_callback': None, 'pin': 27, 'max_throttle': 1860}
+INFO:root:Activated a watchdog (timeout: 5ms) and callback for pin: 22
+INFO:root:Successfully sent start signal (1000) to the pin 22
+INFO:root:Activated a watchdog (timeout: 5ms) and callback for pin: 27
+INFO:root:Successfully sent start signal (1000) to the pin 27
+INFO:root:Activated a watchdog (timeout: 5ms) and callback for pin: 4
+INFO:root:Successfully sent start signal (1000) to the pin 4
+INFO:root:Activated a watchdog (timeout: 5ms) and callback for pin: 17
+INFO:root:Successfully sent start signal (1000) to the pin 17
+WARNING:root:Timeout event triggered from watchdog on pin: 22 (tick: 1751754020). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 27 (tick: 1751755270). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751756570). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751756570). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751756570). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751756570). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751756570). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 17 (tick: 1751756570). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 22 (tick: 1751759445). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 27 (tick: 1751760720). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751761995). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751761995). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751761995). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751761995). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751761995). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 17 (tick: 1751761995). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 22 (tick: 1751764645). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751772420). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751772420). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751772420). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751772420). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751772420). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 17 (tick: 1751772420). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 22 (tick: 1751772420). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 27 (tick: 1751772420). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751777570). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751777570). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751777570). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751777570). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751777570). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 17 (tick: 1751777570). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 22 (tick: 1751777570). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 27 (tick: 1751777570). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751782895). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751782895). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751782895). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751782895). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751782895). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 17 (tick: 1751782895). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 22 (tick: 1751782895). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 27 (tick: 1751782895). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751792120). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751792120). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751792120). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751792120). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751792120). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 17 (tick: 1751792120). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 22 (tick: 1751792120). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 27 (tick: 1751792120). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751797945). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751797945). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751797945). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751797945). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751797945). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 17 (tick: 1751797945). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 22 (tick: 1751797945). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 27 (tick: 1751797945). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751803220). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751803220). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751803220). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751803220). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751803220). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 17 (tick: 1751803220). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 22 (tick: 1751803220). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 27 (tick: 1751803220). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751812970). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751812970). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751812970). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751812970). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751812970). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 17 (tick: 1751812970). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 22 (tick: 1751812970). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 27 (tick: 1751812970). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751818520). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751818520). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751818520). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751818520). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751818520). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 17 (tick: 1751818520). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 22 (tick: 1751818520). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 27 (tick: 1751818520). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751824195). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751824195). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751824195). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751824195). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751824195). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 17 (tick: 1751824195). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 22 (tick: 1751824195). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 27 (tick: 1751824195). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751832395). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751832395). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751832395). Check the motor responsivness or adjust the watchdog.
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x761656d0>, '_started': False, '_gpio_callback': None, 'pin': 4, 'max_throttle': 1860}
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751832395). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751832395). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 17 (tick: 1751832395). Check the motor responsivness or adjust the watchdog.
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x761656d0>, '_started': False, '_gpio_callback': None, 'pin': 17, 'max_throttle': 1860}
+WARNING:root:Timeout event triggered from watchdog on pin: 22 (tick: 1751832395). Check the motor responsivness or adjust the watchdog.
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x761656d0>, '_started': False, '_gpio_callback': None, 'pin': 22, 'max_throttle': 1860}
+INFO:root:Created new instance of Motor class with following attributes: {'stop_signal': 0, 'current_throttle': 0, 'start_signal': 1000, 'min_throttle': 1068, 'pi': <pigpio.pi object at 0x761656d0>, '_started': False, '_gpio_callback': None, 'pin': 27, 'max_throttle': 1860}
+WARNING:root:Timeout event triggered from watchdog on pin: 27 (tick: 1751832395). Check the motor responsivness or adjust the watchdog.
+INFO:root:Activated a watchdog (timeout: 5ms) and callback for pin: 22
+INFO:root:Successfully sent start signal (1000) to the pin 22
+INFO:root:Activated a watchdog (timeout: 5ms) and callback for pin: 27
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751838420). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751838420). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751838420). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751838420). Check the motor responsivness or adjust the watchdog.
+WARNING:root:Timeout event triggered from watchdog on pin: 4 (tick: 1751838420). Check the motor responsivness or adjust the watchdog.
+INFO:root:Successfully sent start signal (1000) to the pin 27
+WARNING:root:Timeout event triggered from watchdog on pin: 17 (tick: 1751838420). Check the motor responsivness or adjust the watchdog.
+INFO:root:Activated a watchdog (timeout: 5ms) and callback for pin: 4
+INFO:root:Successfully sent start signal (1000) to the pin 4
+INFO:root:Activated a watchdog (timeout: 5ms) and callback for pin: 17
+INFO:root:Successfully sent start signal (1000) to the pin 17
+INFO:root:Deactivated watchdog and callback for pin: 22
+INFO:root:Successfully sent stop signal (0) to the pin 22
+INFO:root:Deactivated watchdog and callback for pin: 27
+INFO:root:Successfully sent stop signal (0) to the pin 27
+INFO:root:Deactivated watchdog and callback for pin: 4
+INFO:root:Successfully sent stop signal (0) to the pin 4
+INFO:root:Deactivated watchdog and callback for pin: 17
+INFO:root:Successfully sent stop signal (0) to the pin 17

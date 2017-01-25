@@ -13,7 +13,7 @@ import mpu6050
 import pigpio
 
 # my modules
-from . import config
+import autopylot.config
 
 ###############################################
 # PRINCIPLE OF BEHAVIOR
@@ -66,6 +66,8 @@ class Motor():
                                                self.__dict__))
 
     def verify_motor_started(func):
+        """ Wrapper to verify that the motor is started - should be used
+        on functions / methods which send signals to the ESC """
         def wrapper(self, *args):
             if not self._started:
                 logging.error("Motor was not started properly before sending "
@@ -104,6 +106,8 @@ class Motor():
             return
 
         def callback_func(gpio, level, tick):
+            """ Callback for the gpio pin of the Motor. At the moment only
+            used to log timeout signals from the pigpio watchdog """
             if level == pigpio.TIMEOUT:
                 logging.warning("Timeout event triggered from watchdog on "
                                 "pin: {!s} (tick: {!s}). Check the motor "
@@ -134,9 +138,6 @@ class Motor():
         self.pi.set_watchdog(self.pin, 0)
         logging.info("Deactivated watchdog and callback for pin: {!s}"
                      .format(self.pin))
-
-    def is_started(self):
-        return self._started
 
     def send_start_signal(self):
         """ Sends the start signal (initiation sequence) to the motor (pin).
@@ -249,23 +250,23 @@ class Quadcopter():
 
         self._gyro_sensor = self._init_gyrosensor()
         # TODO add check if gyro is started properly...
-        self.min_throttle = config.get_min_throttle()
-        self.max_throttle = config.get_max_throttle()
+        self.min_throttle = autopylot.config.get_min_throttle()
+        self.max_throttle = autopylot.config.get_max_throttle()
         self.start_signal = 1000
         self.stop_signal = 0
-        self._motor_front_left = self._init_motor(config.
+        self._motor_front_left = self._init_motor(autopylot.config.
                                                   get_motor_front_left_pin())
-        self._motor_front_right = self._init_motor(config.
+        self._motor_front_right = self._init_motor(autopylot.config.
                                                    get_motor_front_right_pin())
-        self._motor_back_left = self._init_motor(config.
+        self._motor_back_left = self._init_motor(autopylot.config.
                                                  get_motor_back_left_pin())
-        self._motor_back_right = self._init_motor(config.
+        self._motor_back_right = self._init_motor(autopylot.config.
                                                   get_motor_back_right_pin())
 
     def _init_gyrosensor(self):
         """ Returns an initialized Gyrosensor object """
         # TODO: add scaling factors to the sensor ...
-        address = config.get_gyrosensor_address()
+        address = autopylot.config.get_gyrosensor_address()
         return mpu6050.mpu6050(address)
 
     def _init_motor(self, pin):
@@ -290,7 +291,7 @@ class Quadcopter():
 
         if not self._is_daemon_running():
             # start pigpiod
-            sample_rate = config.get_pigpiod_sample_rate()
+            sample_rate = autopylot.config.get_pigpiod_sample_rate()
             subproc_command = [daemon_name, '-s', str(sample_rate)]
             try:
                 subprocess.Popen(subproc_command)

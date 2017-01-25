@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module config</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>config</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/pi/projects/PiPyFly/autopylot/config.py">/home/pi/projects/PiPyFly/autopylot/config.py</a></font></td></tr></table>
+    <p><tt>Configuration&nbsp;Module&nbsp;-&nbsp;autom.&nbsp;loads&nbsp;the&nbsp;config.ini&nbsp;file&nbsp;and&nbsp;checks&nbsp;it.<br>
+Also&nbsp;sets&nbsp;up&nbsp;the&nbsp;loggin&nbsp;module&nbsp;so&nbsp;all&nbsp;other&nbsp;modules&nbsp;do&nbsp;not&nbsp;have&nbsp;to&nbsp;worry<br>
+about&nbsp;that&nbsp;and&nbsp;can&nbsp;use&nbsp;it&nbsp;out&nbsp;of&nbsp;the&nbsp;box.</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="configparser.html">configparser</a><br>
+</td><td width="25%" valign=top><a href="logging.html">logging</a><br>
+</td><td width="25%" valign=top><a href="os.html">os</a><br>
+</td><td width="25%" valign=top><a href="re.html">re</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-get_gyrosensor_address"><strong>get_gyrosensor_address</strong></a>()</dt><dd><tt>Returns&nbsp;a&nbsp;int&nbsp;of&nbsp;the&nbsp;hexadecimal&nbsp;address&nbsp;value</tt></dd></dl>
+ <dl><dt><a name="-get_gyrosensor_tilt_front_axis"><strong>get_gyrosensor_tilt_front_axis</strong></a>()</dt><dd><tt>Returns&nbsp;a&nbsp;string&nbsp;indicating&nbsp;which&nbsp;axis&nbsp;will&nbsp;be&nbsp;affected&nbsp;in&nbsp;which&nbsp;way<br>
+when&nbsp;the&nbsp;drone&nbsp;tilts&nbsp;to&nbsp;the&nbsp;front&nbsp;(nose)</tt></dd></dl>
+ <dl><dt><a name="-get_gyrosensor_tilt_left_axis"><strong>get_gyrosensor_tilt_left_axis</strong></a>()</dt><dd><tt>Returns&nbsp;a&nbsp;string&nbsp;indicating&nbsp;which&nbsp;axis&nbsp;will&nbsp;be&nbsp;affected&nbsp;in&nbsp;which&nbsp;way<br>
+when&nbsp;the&nbsp;drone&nbsp;tilts&nbsp;to&nbsp;the&nbsp;left</tt></dd></dl>
+ <dl><dt><a name="-get_log_level"><strong>get_log_level</strong></a>()</dt><dd><tt>Returns&nbsp;the&nbsp;confgiured&nbsp;logging.level</tt></dd></dl>
+ <dl><dt><a name="-get_log_output_file"><strong>get_log_output_file</strong></a>()</dt><dd><tt>Returns&nbsp;the&nbsp;log&nbsp;output&nbsp;filename.</tt></dd></dl>
+ <dl><dt><a name="-get_max_throttle"><strong>get_max_throttle</strong></a>()</dt><dd><tt>Returns&nbsp;the&nbsp;Maximum&nbsp;throttle&nbsp;of&nbsp;the&nbsp;ESC</tt></dd></dl>
+ <dl><dt><a name="-get_min_throttle"><strong>get_min_throttle</strong></a>()</dt><dd><tt>Returns&nbsp;the&nbsp;Minimum&nbsp;throttle&nbsp;of&nbsp;the&nbsp;ESC</tt></dd></dl>
+ <dl><dt><a name="-get_motor_back_left_pin"><strong>get_motor_back_left_pin</strong></a>()</dt><dd><tt>Returns&nbsp;the&nbsp;pin&nbsp;number&nbsp;(BMC)&nbsp;of&nbsp;the&nbsp;4th&nbsp;motor&nbsp;(back&nbsp;left)</tt></dd></dl>
+ <dl><dt><a name="-get_motor_back_right_pin"><strong>get_motor_back_right_pin</strong></a>()</dt><dd><tt>Returns&nbsp;the&nbsp;pin&nbsp;number&nbsp;(BMC)&nbsp;of&nbsp;the&nbsp;3rd&nbsp;motor&nbsp;(back&nbsp;right)</tt></dd></dl>
+ <dl><dt><a name="-get_motor_front_left_pin"><strong>get_motor_front_left_pin</strong></a>()</dt><dd><tt>Returns&nbsp;the&nbsp;pin&nbsp;number&nbsp;(BMC)&nbsp;of&nbsp;the&nbsp;1st&nbsp;motor&nbsp;(front&nbsp;left)</tt></dd></dl>
+ <dl><dt><a name="-get_motor_front_right_pin"><strong>get_motor_front_right_pin</strong></a>()</dt><dd><tt>Returns&nbsp;the&nbsp;pin&nbsp;number&nbsp;(BMC)&nbsp;of&nbsp;the&nbsp;2nd&nbsp;motor&nbsp;(front&nbsp;right)</tt></dd></dl>
+ <dl><dt><a name="-get_pigpiod_sample_rate"><strong>get_pigpiod_sample_rate</strong></a>()</dt><dd><tt>Returns&nbsp;the&nbsp;pigpiod&nbsp;sample&nbsp;rate&nbsp;(int)&nbsp;which&nbsp;should&nbsp;be&nbsp;used&nbsp;when<br>
+starting&nbsp;the&nbsp;daemon</tt></dd></dl>
+ <dl><dt><a name="-get_prop_size"><strong>get_prop_size</strong></a>()</dt><dd><tt>Returns&nbsp;size&nbsp;of&nbsp;the&nbsp;propellers&nbsp;as&nbsp;a&nbsp;string&nbsp;(11x5&nbsp;or&nbsp;9x4.7)</tt></dd></dl>
+ <dl><dt><a name="-verify_config_ini"><strong>verify_config_ini</strong></a>(config_ini)</dt><dd><tt>Verifies&nbsp;the&nbsp;config.ini&nbsp;file&nbsp;(using&nbsp;regular&nbsp;expressions)&nbsp;-&nbsp;to&nbsp;avoid<br>
+wrong&nbsp;inputs</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>config</strong> = &lt;configparser.ConfigParser object&gt;<br>
+<strong>log_level</strong> = 10<br>
+<strong>log_output_file</strong> = 'autopylot.blackbox'</td></tr></table>
+</body></html>

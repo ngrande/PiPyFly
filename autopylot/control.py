@@ -15,6 +15,19 @@ import pigpio
 # my modules
 from . import config
 
+###############################################
+# PRINCIPLE OF BEHAVIOR
+###############################################
+# The user should only be able to send suggestions to the drone.
+# The drone should always verify this and check if it is safe to do so. If yes
+# it could proceed with this action and if not it should self decide what to
+# do in the current situation.
+# ---------------------------------------------
+# Always keep safety in mind and never risk a move.
+# Always expect components to fails
+# Expect the unexpected
+# Priority Nr. 1: Be responsive and stay alive
+###############################################
 
 ################################################
 # LIST OF TODOs                                #
@@ -22,6 +35,9 @@ from . import config
 # TODO implement controls (like changing tilt, or yaw)
 # TODO add a worst case scenario handling for example if the gyro sensor
 # fails in mid fly... or one / several motors stop responding.
+# TODO: Write a wrapper for the gyrosensor so it is easier to change it later
+#  to another module or sensor...
+#
 ################################################
 
 
@@ -350,6 +366,8 @@ class Quadcopter():
             logging.info("Gyrosensor temperature check FAILED. "
                          "Could be too cold or too hot...")
             return False
+
+        raise NotImplemented()
 
 
 # class Gyroscope():

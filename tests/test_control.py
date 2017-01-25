@@ -1,10 +1,10 @@
 import unittest
 import os
 import sys
-import logging
+# import logging
 
 import pigpio
-import psutil
+# import psutil
 
 sys.path.insert(0, os.path.abspath('..'))
 

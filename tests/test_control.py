@@ -113,14 +113,6 @@ class TestControlQuadcopter(unittest.TestCase):
         self.assertTrue(self.quadcopter.turn_on())
         self.assertTrue(self.quadcopter.turn_off())
 
-    def test_get_gyrotemp(self):
-        """ Tests if the gyrosensor returns valid temperature values in °C """
-        temp = round(self.quadcopter.get_gyrosensor_temp(), 0)
-        # this test should be run in a room so i expect values
-        # within "room temperature"
-        in_range = temp in range(18, 30)
-        self.assertTrue(in_range)
-
     # ########################################################################
     # def test_auto_daemon_spawn(self):
     #     """ Tests if the Quadcopter automatically spawns the pigpiod daemon

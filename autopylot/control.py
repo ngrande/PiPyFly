@@ -9,10 +9,11 @@ import subprocess
 
 # pip installed modules
 import psutil
-import mpu6050
+# import mpu6050
 import pigpio
 
 # my modules
+import autopylot.sensor
 import autopylot.config
 
 ###############################################
@@ -68,6 +69,7 @@ class Motor():
     def verify_motor_started(func):
         """ Wrapper to verify that the motor is started - should be used
         on functions / methods which send signals to the ESC """
+
         def wrapper(self, *args):
             if not self._started:
                 logging.error("Motor was not started properly before sending "
@@ -267,7 +269,8 @@ class Quadcopter():
         """ Returns an initialized Gyrosensor object """
         # TODO: add scaling factors to the sensor ...
         address = autopylot.config.get_gyrosensor_address()
-        return mpu6050.mpu6050(address)
+        return autopylot.sensor.Gyrosensor(autopylot
+                                           .config.get_gyrosensor_address())
 
     def _init_motor(self, pin):
         """ Returns an initialized Motor object """
@@ -344,36 +347,3 @@ class Quadcopter():
             logging.critical("Exception occurred while sending the start "
                              "signal to the motors: {!s}".format(e))
             return False
-
-    def get_gyrosensor_temp(self):
-        """ Returns the temperature of the gyrosensor in °C
-        (rounded to one decimal) """
-        rounded_temp = round(self._gyro_sensor.get_temp(), 1)
-        logging.debug("Current gyrosensor temperature: {!s}°C"
-                      .format(rounded_temp))
-        return rounded_temp
-
-    def _perform_gyrosensor_check(self):
-        """ Checks if the gyrosensor is active and responding with
-        appropriate data """
-        logging.debug("Performing check if gyrosensor is responding and "
-                      "returns valid values")
-        temp = round(self.quadcopter.get_gyro_temp(), 0)
-        in_range = temp in range(10, 40)
-        logging.debug("Gyrosensor temperature measured: {!s}°C".format(temp))
-        if in_range:
-            logging.info("Gyrosensor temperature check PASSED")
-        else:
-            logging.info("Gyrosensor temperature check FAILED. "
-                         "Could be too cold or too hot...")
-            return False
-
-        raise NotImplemented()
-
-
-# class Gyroscope():
-#     """ Class to interface the gyrosensor """
-#
-#     def __init__(self, pi, pin):
-#         address = config.get_gyrosensor_address()
-#         self.sensor = mpu6050.mpu6050(address)

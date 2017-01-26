@@ -1,5 +1,6 @@
 # virtualenvironment directory
 venv/
+*.blackbox
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

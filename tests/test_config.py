@@ -82,5 +82,6 @@ class TestControlMotor(unittest.TestCase):
         with self.assertRaises(Exception):
             self.assertFalse(config.verify_config_ini(invalid_config))
 
+
 if __name__ == '__main__':
         unittest.main()

@@ -56,16 +56,21 @@ class Motor():
         self.pin = int(pin)
         self.start_signal = int(start_signal)
         self.stop_signal = int(stop_signal)
-        self.min_throttle = int(min_throttle)
-        self.max_throttle = int(max_throttle)
-        self.current_throttle = 0
+        self.min_throttle = int(min_throttle)  # => 1% throttle
+        self.max_throttle = int(max_throttle)  # => 100% throttle
+        self.current_throttle = 0  # in percent % (1% => min_throttle)
         self._started = False
+        self._perc_value_map = self._create_perc_value_map(self.min_throttle,
+                                                           self.max_throttle)
         # the callback return object - do not change this - it is private!
         self._gpio_callback = None
         logging.info("Created new instance of {!s} class with following "
                      "attributes: {!s}".format(self.__class__.__name__,
                                                self.__dict__))
 
+    ###########################################################################
+    # Decorator functions
+    ###########################################################################
     def verify_motor_started(func):
         """ Wrapper to verify that the motor is started - should be used
         on functions / methods which send signals to the ESC """
@@ -91,15 +96,18 @@ class Motor():
             res = func(self, *args)
             after_change = self.current_throttle
             total_change = abs(before_change - after_change)
-            total_change_perc = total_change * 100 / before_change
-            if total_change_perc >= 33:
+            # total_change_perc = total_change * 100 / before_change
+            if total_change >= 33:
                 logging.warning("Detected a change of throttle from {!s} to "
-                                "{!s} ({!s} -> {!s}%). Please verify the usage"
+                                "{!s} ({!s}%). Please verify the usage"
                                 " and check if this could damage your motors."
                                 .format(before_change, after_change,
-                                        total_change, total_change_perc))
+                                        total_change))
             return res
         return wrapper
+
+    ###########################################################################
+    ###########################################################################
 
     def _register_gpio_watchdog(self):
         """ Registers a watchdog and callback function to the gpio pin.
@@ -125,8 +133,8 @@ class Motor():
         # is an unexpected behavior...
         # *******************************************************
 
-        # set watchdog to 5ms (because we need full control over the motor)
-        wd_timeout_ms = 5
+        # set watchdog to 10ms (because we need full control over the motor)
+        wd_timeout_ms = 10
         self.pi.set_watchdog(self.pin, wd_timeout_ms)
         logging.info("Activated a watchdog (timeout: {!s}ms) and callback for "
                      "pin: {!s}".format(wd_timeout_ms, self.pin))
@@ -141,6 +149,38 @@ class Motor():
         logging.info("Deactivated watchdog and callback for pin: {!s}"
                      .format(self.pin))
 
+    def _create_perc_value_map(self, min_throttle, max_throttle):
+        """ Maps the min and max throttle values into a map of percentage
+        values - this saves a lot of computations later.
+        min throttle => 1% and max throttle => 100%. """
+        perc_to_value_dict = {}
+        step = (max_throttle - min_throttle) / 99
+        one_perc = min_throttle - step  # to let min throttl be 1%
+        for perc in range(0, 100 + 1):
+            perc_to_value_dict[perc] = int(one_perc + (step * perc))
+
+        return perc_to_value_dict
+
+    def _convert_percent_to_actual_value(self, percent_val):
+        """ Converts the percentage (throttle) value to the actual value.
+        1% => min throttle and 100% => max throttle """
+        # 1% => Min throttle
+        # 100% => Max Throttle
+        # these values are precalculated (and stored in a dict)
+        # for faster computation
+        verified_value = percent_val
+        if percent_val not in range(0, 101):
+            logging.error("percent_val ({!s}) was not within the valid "
+                          "range from 0 to 100.".format(percent_val))
+            if percent_val < 0:
+                verified_value = 0
+            elif percent_val > 100:
+                verified_value = 100
+            logging.warning("changed the percent_val input from {!s} to a "
+                            "valid {!s}".format(percent_val, verified_value))
+        actual_value = self._perc_value_map[verified_value]
+        return actual_value
+
     def send_start_signal(self):
         """ Sends the start signal (initiation sequence) to the motor (pin).
         Returns True if successful otherwise False
@@ -151,7 +191,7 @@ class Motor():
             self.pi.set_servo_pulsewidth(self.pin, self.start_signal)
             self._started = True
             self._register_gpio_watchdog()
-            self.current_throttle = self.start_signal
+            self.current_throttle = 0
             logging.info("Successfully sent start signal ({!s}) "
                          "to the pin {!s}".format(self.start_signal, self.pin))
             return True
@@ -172,7 +212,7 @@ class Motor():
             self.pi.set_servo_pulsewidth(self.pin, self.stop_signal)
             self._started = False
             self._unregister_gpio_watchdog()
-            self.current_throttle = self.stop_signal
+            self.current_throttle = 0
             logging.info("Successfully sent stop signal ({!s}) "
                          "to the pin {!s}".format(self.stop_signal, self.pin))
             return True
@@ -185,11 +225,11 @@ class Motor():
     @verify_motor_started
     def send_throttle_adjustment(self, throttle_add):
         """ increases / decreases the current throttle by the
-        throttle_add value """
+        throttle_add value (in percent %) """
         new_total_throttle = self.current_throttle + throttle_add
-        logging.info("Sending throttle adjustment of {!s} to current "
-                     "throttle {!s}".format(throttle_add,
-                                            self.current_throttle))
+        logging.info("Sending throttle adjustment of {!s}% to current "
+                     "throttle {!s}%".format(throttle_add,
+                                             self.current_throttle))
         # easier and cleaner when just using the general function
         res = self.send_throttle(new_total_throttle)
         return res
@@ -197,37 +237,34 @@ class Motor():
     @verify_motor_started
     @check_throttle_change
     def send_throttle(self, throttle):
-        """ sets the current throttle to the new value """
-        if throttle < self.min_throttle:
-            text_error_too_low = "Can not set throttle ({!s}) lower than the "\
-                "minimum ({!s})".format(throttle, self.min_throttle)
+        """ sets the current throttle (in percent %) to the new value """
+        if throttle < 0:
+            text_error_too_low = "Can not set throttle ({!s}%) lower than " \
+                "0%".format(throttle, self.min_throttle)
             logging.error(text_error_too_low)
             # do not throw an exception we want to keep the motor alive
             # raise Exception(text_error_too_low)
             return False
-        elif throttle > self.max_throttle:
-            text_error_too_high = "Can not set throttle higher ({!s}) than "\
-                "the maximum ({!s})".format(throttle, self.max_throttle)
+        elif throttle > 100:
+            text_error_too_high = "Can not set throttle higher ({!s}%) than "\
+                "100%".format(throttle, self.max_throttle)
             logging.error(text_error_too_high)
             # do not throw an exception we want to keep the motor alive
             # raise Exception(text_error_too_high)
             return False
 
         try:
-            # TODO: add some checks like:
-            # * throttle too high cmpared to current throttle?
-            # Could hurt motors?
-            # * throttle too low compared to current throttle?
-            # Could hurt drone?
-            self.pi.set_servo_pulsewidth(self.pin, throttle)
+            actual_throttle_value = self._convert_percent_to_actual_value(
+                throttle)
+            self.pi.set_servo_pulsewidth(self.pin, actual_throttle_value)
             current_throttle_before = self.current_throttle
             self.current_throttle = throttle
-            logging.info("Successfully adjusted throttle from {!s} to {!s} "
+            logging.info("Successfully adjusted throttle from {!s}% to {!s}% "
                          "on pin {!s}".format(current_throttle_before,
                                               self.current_throttle, self.pin))
             return True
         except Exception as e:
-            logging.exception("Error while adjusting throttle to {!s} "
+            logging.exception("Error while adjusting throttle to {!s}% "
                               "on pin {!s}".format(throttle, self.pin))
             return False
 
@@ -267,7 +304,6 @@ class Quadcopter():
 
     def _init_gyrosensor(self):
         """ Returns an initialized Gyrosensor object """
-        # TODO: add scaling factors to the sensor ...
         address = autopylot.config.get_gyrosensor_address()
         return autopylot.sensor.Gyrosensor(autopylot
                                            .config.get_gyrosensor_address())
@@ -312,13 +348,17 @@ class Quadcopter():
                          .format(daemon_name))
         return self._is_daemon_running()
 
+    def _for_each_motor(self):
+        """ Returns a list of all motors where you can iterate over """
+        return [self._motor_back_left, self._motor_back_right,
+                self._motor_front_left, self._motor_front_right]
+
     def turn_off(self):
         """ Sends stop signal to each motor and stops the pigpio.pi object """
         # TODO: add logic to bring the quadcopter safely home / down?
         success = True
         try:
-            for motor in [self._motor_back_left, self._motor_back_right,
-                          self._motor_front_left, self._motor_front_right]:
+            for motor in self._for_each_motor():
                 success = motor.send_stop_signal()
                 if not success:
                     logging.exception("Unable to stop motor: {!s}"
@@ -335,8 +375,7 @@ class Quadcopter():
     def turn_on(self):
         """ Sends start signal to each motor """
         try:
-            for motor in [self._motor_back_left, self._motor_back_right,
-                          self._motor_front_left, self._motor_front_right]:
+            for motor in self._for_each_motor():
                 success = motor.send_start_signal()
                 if not success:
                     logging.exception("Unable to start motor: {!s}"
@@ -346,4 +385,19 @@ class Quadcopter():
         except Exception as e:
             logging.critical("Exception occurred while sending the start "
                              "signal to the motors: {!s}".format(e))
+            return False
+
+    def change_overall_throttle(self, throttle):
+        """ Sends a throttle (%) adjustement to all motors """
+        try:
+            for motor in self._for_each_motor():
+                success = motor.send_throttle_adjustment(throttle)
+                if not success:
+                    logging.exception("Unable to send throttle adjustment "
+                                      "to motor: {!s}".format(motor.__dict__))
+                    return False
+            return True
+        except Exception as e:
+            logging.critical("Exception occured while sending throttle "
+                             "adjustment to the motors: {!s}".format(e))
             return False

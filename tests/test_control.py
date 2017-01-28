@@ -14,11 +14,15 @@ import autopylot.control as control
 
 class TestControlMotor(unittest.TestCase):
     """ Class to test the motor control class """
+
     def setUp(self):
         self.pi = pigpio.pi()
-        self.motor = control.Motor(pi=self.pi, pin=4, start_signal=1000,
-                                   stop_signal=0, min_throttle=1068,
-                                   max_throttle=1890)
+        self.min_throttle = 1068
+        self.max_throttle = 1890
+        self.motor = control.Motor(pi=self.pi, pin=6, start_signal=1000,
+                                   stop_signal=0,
+                                   min_throttle=self.min_throttle,
+                                   max_throttle=self.max_throttle)
 
     def tearDown(self):
         self.pi = None
@@ -44,11 +48,13 @@ class TestControlMotor(unittest.TestCase):
         self.assertTrue(self.motor.send_stop_signal())
 
     def test_send_throttle_adjustment(self):
-        """ Tests the throttle adjustment sending.
+        """ Tests the throttle % adjustment sending.
         Will perform a motor start, an normal adjustment, a too high adjustment
         and a too low adjustment. """
         self.assertTrue(self.motor.send_start_signal())
-        self.assertTrue(self.motor.send_throttle_adjustment(100))
+        self.assertTrue(self.motor.send_throttle_adjustment(10))
+        self.assertTrue(self.motor.send_throttle_adjustment(90))
+        self.assertFalse(self.motor.send_throttle_adjustment(1))
         # should fail because we already sent 100 and the maximum is 1890
         # 100 + 1800 = 1900 = FAIL
         # with self.assertRaises(Exception):
@@ -57,18 +63,20 @@ class TestControlMotor(unittest.TestCase):
         #     self.motor.send_throttle_adjustment(-200)
         self.assertFalse(self.motor.send_throttle_adjustment(800))
         self.assertFalse(self.motor.send_throttle_adjustment(-200))
+        self.assertTrue(self.motor.send_stop_signal())
         # self.assertTrue(self.motor.send_throttle_adjustment(760))
 
     def test_send_throttle(self):
-        """ Tests the throttle sending.
+        """ Tests the throttle % sending.
         Will perform a motor start, an normal throttle and three failing
         throttle values (negative value, zero and much too high) """
 
         self.assertTrue(self.motor.send_start_signal())
-        self.assertTrue(self.motor.send_throttle(1200))
+        self.assertTrue(self.motor.send_throttle(20))
         self.assertFalse(self.motor.send_throttle(-1))
-        self.assertFalse(self.motor.send_throttle(0))
+        self.assertFalse(self.motor.send_throttle(101))
         self.assertFalse(self.motor.send_throttle(99999))
+        self.assertTrue(self.motor.send_stop_signal())
 
     def test_decorator_check_throttle_change(self):
         """ Tests the decorator which checks the throttle change and should
@@ -77,16 +85,44 @@ class TestControlMotor(unittest.TestCase):
 
         self.assertTrue(self.motor.send_start_signal())
         # from 0 to 100
-        self.assertTrue(self.motor.send_throttle(1860))
+        self.assertTrue(self.motor.send_throttle(100))
         # TODO: add assert for logging
         # self.assertTrue(autopylot.logging.)
         # with self.assertLogs(autopylot.logging.getLogger(autopylot.__name__),
         # logging.WARNING):
         #     self.motor.send_throttle(1860)
 
+    def test_create_perc_to_value_dict(self):
+        """ Tests the creation of the percent to value map dictionary.
+        Min throttle should always be mapped to 1% and max throttle to 100% """
+        min_max_throlles = [(1068, 1860), (1000, 2000), (3, 103)]
+
+        for min_v, max_v in min_max_throlles:
+            mapped_dict = self.motor._create_perc_value_map(min_v, max_v)
+            self.assertTrue(mapped_dict[1] == min_v)
+            self.assertTrue(mapped_dict[100] == max_v)
+            self.assertFalse(mapped_dict[0] == min_v)
+            self.assertTrue(len(mapped_dict) == 101)
+
+    def test_convert_percent_to_actual_value(self):
+        """ Tests if the convert percent to actual value is giving back a valid
+        value in each case """
+        input_too_low = -10
+        input_too_high = 101
+        input_correct = 33
+        self.assertIs(
+            self.motor._convert_percent_to_actual_value(input_too_low),
+            self.motor._perc_value_map[0])
+        self.assertIs(self.motor._convert_percent_to_actual_value(
+            input_too_high), self.motor._perc_value_map[100])
+        self.assertIs(
+            self.motor._convert_percent_to_actual_value(input_correct),
+            self.motor._perc_value_map[33])
+
 
 class TestControlQuadcopter(unittest.TestCase):
     """ Class to test the quadcopter control class """
+
     def setUp(self):
         self.quadcopter = control.Quadcopter()
 
@@ -113,6 +149,15 @@ class TestControlQuadcopter(unittest.TestCase):
         self.assertTrue(self.quadcopter.turn_on())
         self.assertTrue(self.quadcopter.turn_off())
 
+    def test_change_overall_throttle(self):
+        """ Tests changing the overall throttle of the quadcopter """
+        self.assertTrue(self.quadcopter.turn_on())
+        self.assertTrue(self.quadcopter.change_overall_throttle(20))
+        self.assertTrue(self.quadcopter.change_overall_throttle(-20))
+        self.assertFalse(self.quadcopter.change_overall_throttle(-200))
+        self.assertTrue(self.quadcopter.change_overall_throttle(100))
+        self.assertTrue(self.quadcopter.change_overall_throttle(0))
+
     # ########################################################################
     # def test_auto_daemon_spawn(self):
     #     """ Tests if the Quadcopter automatically spawns the pigpiod daemon
@@ -131,5 +176,6 @@ class TestControlQuadcopter(unittest.TestCase):
     #     self.assertTrue(daemon_running)
     # ########################################################################
 
+
 if __name__ == '__main__':
-        unittest.main()
+    unittest.main()

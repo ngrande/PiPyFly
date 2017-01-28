@@ -159,6 +159,33 @@ class TestControlQuadcopter(unittest.TestCase):
         self.assertTrue(self.quadcopter.change_overall_throttle(100))
         self.assertTrue(self.quadcopter.change_overall_throttle(0))
 
+    def test_change_yaw(self):
+        """ Tests changing the yaw of the quadcopter """
+        # TODO would be useful here to scan though each motor after Performing
+        # a change of yaw and see if it was applied correctly
+        self.assertTrue(self.quadcopter.turn_on())
+        self.assertTrue(self.quadcopter.change_overall_throttle(50))
+        self.assertTrue(self.quadcopter.change_yaw(20))
+        self.assertTrue(self.quadcopter.change_yaw(-20))
+        self.assertTrue(self.quadcopter.change_yaw(0))
+        self.assertFalse(self.quadcopter.change_yaw(101))
+
+    def test_change_yaw__while_hover_and_control_each_motor(self):
+        """ Tests changing the yaw of the quadcopter """
+        # TODO would be useful here to scan though each motor after Performing
+        # a change of yaw and see if it was applied correctly
+        self.assertTrue(self.quadcopter.turn_on())
+        self.assertTrue(self.quadcopter.change_overall_throttle(50))
+        self.assertTrue(self.quadcopter.change_yaw(20))
+
+        for motor in self.quadcopter._for_each_motor():
+            if motor.cw_rotation:
+                self.assertIs(motor.current_throttle, 60)
+            else:
+                self.assertIs(motor.current_throttle, 40)
+        self.assertTrue(self.quadcopter.change_yaw(-20))
+        self.assertTrue(self.quadcopter.change_yaw(0))
+
     # ########################################################################
     # def test_auto_daemon_spawn(self):
     #     """ Tests if the Quadcopter automatically spawns the pigpiod daemon

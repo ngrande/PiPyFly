@@ -23,14 +23,14 @@ class TestControlMotor(unittest.TestCase):
             [MOTORS.PIN]
             motorfrontleft = 4
             motorfrontright = 17
-            motorbackleft = 22
-            motorbackright = 27
+            motorrearleft = 22
+            motorrearright = 27
 
             [MOTORS.ROTATION]
             motorfrontleft = CW
             motorfrontright = CCW
-            motorbackleft = CCW
-            motorbackright = CW
+            motorrearleft = CCW
+            motorrearright = CW
 
             [GYRO]
             address = 0x68
@@ -61,14 +61,14 @@ class TestControlMotor(unittest.TestCase):
             [PIN]
             motorfrontleft = 4
             motorfrontright = 17
-            motorbackleft = 22
-            motorbackright = 27
+            motorrearleft = 22
+            motorrearright = 27
 
             [MOTORS.ROTATION]
             motorfrontleft = yCW
             motorfrontright = CCW
-            motorbackleft = CCW
-            motorbackright = CW
+            motorrearleft = CCW
+            motorrearright = CW
 
             [GYRO]
             address = 0x68

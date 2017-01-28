@@ -21,12 +21,12 @@ def verify_config_ini(config_ini):
                 "minimum": "[1-9][0-9]*"},
         "MOTORS.PIN": {"motorfrontleft": "[1-9][0-9]{0,1}",
                        "motorfrontright": "[1-9][0-9]{0,1}",
-                       "motorbackleft": "[1-9][0-9]{0,1}",
-                       "motorbackright": "[1-9][0-9]{0,1}"},
+                       "motorrearleft": "[1-9][0-9]{0,1}",
+                       "motorrearright": "[1-9][0-9]{0,1}"},
         "MOTORS.ROTATION": {"motorfrontleft": "(?i)(ccw|cw)",
                             "motorfrontright": "(?i)(ccw|cw)",
-                            "motorbackleft": "(?i)(ccw|cw)",
-                            "motorbackright": "(?i)(ccw|cw)"},
+                            "motorrearleft": "(?i)(ccw|cw)",
+                            "motorrearright": "(?i)(ccw|cw)"},
         # TODO add logical check to see if it is a valid posix filename
         "LOG": {"level": "(?i)(critical|error|warning|info|debug|notset)",
                 "outputfile": "[a-zA-Z0-9]+.*"},
@@ -85,14 +85,14 @@ def get_motor_front_right_pin():
     return int(config['MOTORS.PIN']['motorfrontright'])
 
 
-def get_motor_back_left_pin():
-    """ Returns the pin number (BMC) of the 4th motor (back left) """
-    return int(config['MOTORS.PIN']['motorbackleft'])
+def get_motor_rear_left_pin():
+    """ Returns the pin number (BMC) of the 4th motor (rear left) """
+    return int(config['MOTORS.PIN']['motorrearleft'])
 
 
-def get_motor_back_right_pin():
-    """ Returns the pin number (BMC) of the 3rd motor (back right) """
-    return int(config['MOTORS.PIN']['motorbackright'])
+def get_motor_rear_right_pin():
+    """ Returns the pin number (BMC) of the 3rd motor (rear right) """
+    return int(config['MOTORS.PIN']['motorrearright'])
 
 
 def get_motor_front_left_rotation_is_cw():
@@ -109,17 +109,17 @@ def get_motor_front_right_rotation_is_cw():
     return bool(True if rotation_str == 'cw' else False)
 
 
-def get_motor_back_right_rotation_is_cw():
-    """ Returns True or False if the rotation of the 3rd motor (back right) is
+def get_motor_rear_right_rotation_is_cw():
+    """ Returns True or False if the rotation of the 3rd motor (rear right) is
     clockwise """
-    rotation_str = config['MOTORS.ROTATION']['motorbackright'].lower()
+    rotation_str = config['MOTORS.ROTATION']['motorrearright'].lower()
     return bool(True if rotation_str == 'cw' else False)
 
 
-def get_motor_back_left_rotation_is_cw():
-    """ Returns True or False if the rotation of the 4th motor (back left) is
+def get_motor_rear_left_rotation_is_cw():
+    """ Returns True or False if the rotation of the 4th motor (rear left) is
     clockwise """
-    rotation_str = config['MOTORS.ROTATION']['motorbackleft'].lower()
+    rotation_str = config['MOTORS.ROTATION']['motorrearleft'].lower()
     return bool(True if rotation_str == 'cw' else False)
 
 

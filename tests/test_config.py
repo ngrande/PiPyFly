@@ -20,30 +20,36 @@ class TestControlMotor(unittest.TestCase):
     def test_verify_config(self):
         """ Checks if the verify_config_ini is doing it's job """
         valid_config_str = """
-            [PIN]
-            MotorFrontLeft = 4
-            MotorFrontRight = 17
-            MotorBackLeft = 22
-            MotorBackRight = 27
+            [MOTORS.PIN]
+            motorfrontleft = 4
+            motorfrontright = 17
+            motorbackleft = 22
+            motorbackright = 27
+
+            [MOTORS.ROTATION]
+            motorfrontleft = CW
+            motorfrontright = CCW
+            motorbackleft = CCW
+            motorbackright = CW
 
             [GYRO]
-            Address = 0x68
-            TiltFront = +y
-            TiltLeft = +x
+            address = 0x68
+            tiltfront = +y
+            tiltleft = +x
 
             [ESC]
-            Minimum = 1068
-            Maximum = 1860
+            minimum = 1068
+            maximum = 1860
 
             [AERO]
-            PropSize = 11x5
+            propsize = 11x5
 
             [LOG]
-            OutputFile = autopylot.log
-            Level = debug
+            outputfile = autopylot.log
+            level = debug
 
             [PIGPIOD]
-            SampleRate = 1
+            samplerate = 1
         """
         valid_config = configparser.ConfigParser()
         valid_config.read_string(valid_config_str)
@@ -53,29 +59,35 @@ class TestControlMotor(unittest.TestCase):
         """ Checks if the verify_config_ini raises an Exception as expected """
         invalid_config_str = """
             [PIN]
-            MotorFrontLeft = 4
-            MotorFrontRight = 17
-            MotorBackLeft = 22
-            MotorBackRight = 27
+            motorfrontleft = 4
+            motorfrontright = 17
+            motorbackleft = 22
+            motorbackright = 27
+
+            [MOTORS.ROTATION]
+            motorfrontleft = yCW
+            motorfrontright = CCW
+            motorbackleft = CCW
+            motorbackright = CW
 
             [GYRO]
-            Address = 0x68
-            TiltFront = +y
-            TiltLeft = +x
+            address = 0x68
+            tiltfront = +y
+            tiltleft = +x
 
             [ESC]
-            Minimum = 1068asdf
-            Maximum = 1860
+            minimum = 1068asdf
+            maximum = 1860
 
             [AERO]
-            PropSize = 11x5
+            propsize = 11x5
 
             [LOG]
-            OutputFile = autopylot.log
-            Level = nothing
+            outputfile = autopylot.log
+            level = nothing
 
             [PIGPIOD]
-            SampleRate = 1
+            samplerate = 1
         """
         invalid_config = configparser.ConfigParser()
         invalid_config.read_string(invalid_config_str)

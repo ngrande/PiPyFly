@@ -47,13 +47,14 @@ class Motor():
     There should not be a need to use this class - as it is
     already used by the Quadcopter class which will handle this """
 
-    def __init__(self, pi, pin, start_signal, stop_signal,
+    def __init__(self, pi, pin, cw_rotation, start_signal, stop_signal,
                  min_throttle, max_throttle):
         if not pi:
             logging.error("Pi = None. Unable to control the motor")
             raise Exception("Pi = None. Unable to take control over the motor")
         self.pi = pi
         self.pin = int(pin)
+        self.cw_rotation = bool(cw_rotation)
         self.start_signal = int(start_signal)
         self.stop_signal = int(stop_signal)
         self.min_throttle = int(min_throttle)  # => 1% throttle
@@ -293,14 +294,18 @@ class Quadcopter():
         self.max_throttle = autopylot.config.get_max_throttle()
         self.start_signal = 1000
         self.stop_signal = 0
-        self._motor_front_left = self._init_motor(autopylot.config.
-                                                  get_motor_front_left_pin())
-        self._motor_front_right = self._init_motor(autopylot.config.
-                                                   get_motor_front_right_pin())
-        self._motor_back_left = self._init_motor(autopylot.config.
-                                                 get_motor_back_left_pin())
-        self._motor_back_right = self._init_motor(autopylot.config.
-                                                  get_motor_back_right_pin())
+        self._motor_front_left = self._init_motor(
+            autopylot.config.get_motor_front_left_pin(),
+            autopylot.config.get_motor_front_left_rotation_is_cw())
+        self._motor_front_right = self._init_motor(
+            autopylot.config.get_motor_front_right_pin(),
+            autopylot.config.get_motor_front_right_rotation_is_cw())
+        self._motor_back_left = self._init_motor(
+            autopylot.config.get_motor_back_left_pin(),
+            autopylot.config.get_motor_back_left_rotation_is_cw())
+        self._motor_back_right = self._init_motor(
+            autopylot.config.get_motor_back_right_pin(),
+            autopylot.config.get_motor_back_right_rotation_is_cw())
 
     def _init_gyrosensor(self):
         """ Returns an initialized Gyrosensor object """
@@ -308,10 +313,35 @@ class Quadcopter():
         return autopylot.sensor.Gyrosensor(autopylot
                                            .config.get_gyrosensor_address())
 
-    def _init_motor(self, pin):
+    def _init_motor(self, pin, cw_rotation):
         """ Returns an initialized Motor object """
-        return Motor(self.pi, pin, self.start_signal, self.stop_signal,
-                     self.min_throttle, self.max_throttle)
+        return Motor(self.pi, pin, cw_rotation, self.start_signal,
+                     self.stop_signal, self.min_throttle, self.max_throttle)
+
+    def _check_motor_rotations(self):
+        """ Checks if the quadcopter will be able to stay still (rotaiton should
+        be cw + ccw + cw + ccw) """
+        if (self._motor_front_left.cw_rotation ==
+                self._motor_front_right.cw_rotation):
+            logging.critical("The two front motors should not be rotating "
+                             "in the same direction (cw or ccw)")
+            return False
+        if (self._motor_back_left.cw_rotation ==
+                self._motor_back_right.cw_rotation):
+            logging.critical("The two rear motors should not be rotating "
+                             "in the same direction (cw or ccw)")
+            return False
+        if (self._motor_front_left.cw_rotation ==
+                self._motor_back_left.cw_rotation):
+            logging.critical("The two left motors (front and rear) should not "
+                             "be rotating in the same direction (cw or ccw)")
+            return False
+        if (self._motor_front_right.cw_rotation ==
+                self._motor_back_right.cw_rotation):
+            logging.critical("The two right motors (front and rear) should "
+                             "not be rotating in the same direction "
+                             "(cw or ccw)")
+            return False
 
     def _is_daemon_running(self):
         """ Searches for the pigpiod daemon process. Returns True if found
@@ -356,48 +386,70 @@ class Quadcopter():
     def turn_off(self):
         """ Sends stop signal to each motor and stops the pigpio.pi object """
         # TODO: add logic to bring the quadcopter safely home / down?
-        success = True
+        overall_success = True
         try:
             for motor in self._for_each_motor():
                 success = motor.send_stop_signal()
                 if not success:
                     logging.exception("Unable to stop motor: {!s}"
                                       .format(motor.__dict__))
-                    success = False
+                    overall_success = False
             # self.pi.stop()
         except Exception as e:
             logging.critical("Exception occurred while sending the start "
                              "signal to the motors: {!s}".format(e))
-            success = False
-
-        return success
+            overall_success = False
+        return overall_success
 
     def turn_on(self):
         """ Sends start signal to each motor """
+        overall_success = True
         try:
             for motor in self._for_each_motor():
                 success = motor.send_start_signal()
                 if not success:
                     logging.exception("Unable to start motor: {!s}"
                                       .format(motor.__dict__))
-                    return False
-            return True
+                    overall_success = False
         except Exception as e:
             logging.critical("Exception occurred while sending the start "
                              "signal to the motors: {!s}".format(e))
-            return False
+            overall_success = False
+        return overall_success
 
     def change_overall_throttle(self, throttle):
-        """ Sends a throttle (%) adjustement to all motors """
+        """ Sends a throttle (%) adjustement to all motors. Valid value is
+        between 0 - 100% """
+        overall_sucess = True
         try:
             for motor in self._for_each_motor():
                 success = motor.send_throttle_adjustment(throttle)
                 if not success:
                     logging.exception("Unable to send throttle adjustment "
                                       "to motor: {!s}".format(motor.__dict__))
-                    return False
-            return True
+                    overall_sucess = False
         except Exception as e:
             logging.critical("Exception occured while sending throttle "
                              "adjustment to the motors: {!s}".format(e))
-            return False
+            overall_sucess = False
+        return overall_sucess
+
+    def change_yaw(self, absolute_yaw):
+        """ Sends throttle (%) adjustements to the motors that result in a yaw.
+        If the value is positive it will yaw clockwise and otherwise
+        counterclockwise. Valid value is between 0 - 100%"""
+        # TODO
+        # Edge cases:
+        # Motor could already be at 100% throttle
+        # Change each motor independently (because it could be tilted)
+        for motor in self._for_each_motor():
+            change_for_yaw = motor.current_throttle / 100 * absolute_yaw
+            if absolute_yaw > 0:
+                # clockwise yaw
+                motor.send_throttle_adjustment()
+            elif absolute_yaw < 0:
+                # counterclockwise yaw
+                pass
+            else:
+                # stop yaw
+                pass

@@ -22,7 +22,8 @@ class TestControlMotor(unittest.TestCase):
         self.motor = control.Motor(pi=self.pi, pin=6, start_signal=1000,
                                    stop_signal=0,
                                    min_throttle=self.min_throttle,
-                                   max_throttle=self.max_throttle)
+                                   max_throttle=self.max_throttle,
+                                   cw_rotation=True)
 
     def tearDown(self):
         self.pi = None

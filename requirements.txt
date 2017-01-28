@@ -1,2 +1,3 @@
 pigpio
-mpu6050-raspberrypi 
+mpu6050-raspberrypi
+psutil

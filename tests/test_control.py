@@ -139,6 +139,10 @@ class TestControlQuadcopter(unittest.TestCase):
         """ Tests the turn off method """
         self.assertTrue(self.quadcopter.turn_off())
 
+    def test_is_daemon_running(self):
+        """ Tests if it can detect the pigpiod daemon process running """
+        self.assertTrue(self.quadcopter._is_daemon_running())
+
     def test_turn_on_turn_off(self):
         """ Tests turning on and then turning off """
         self.assertTrue(self.quadcopter.turn_on())
@@ -201,7 +205,7 @@ class TestControlQuadcopter(unittest.TestCase):
         self.assertIs(self.quadcopter._motor_rear_left.current_throttle, 65)
 
     def test_change_tilt_front(self):
-        """ Tests changing the tilt """
+        """ Tests changing the tilt to the front """
         self.assertTrue(self.quadcopter.turn_on())
         self.assertTrue(self.quadcopter.change_overall_throttle(50))
 
@@ -213,7 +217,7 @@ class TestControlQuadcopter(unittest.TestCase):
         self.assertIs(self.quadcopter._motor_rear_left.current_throttle, 60)
 
     def test_change_tilt_front_left(self):
-        """ Tests changing the tilt """
+        """ Tests changing the tilt to the front left """
         self.assertTrue(self.quadcopter.turn_on())
         self.assertTrue(self.quadcopter.change_overall_throttle(50))
 
@@ -226,7 +230,7 @@ class TestControlQuadcopter(unittest.TestCase):
         self.assertIs(self.quadcopter._motor_rear_left.current_throttle, 50)
 
     def test_change_tilt_front_right(self):
-        """ Tests changing the tilt """
+        """ Tests changing the tilt to the front right """
         self.assertTrue(self.quadcopter.turn_on())
         self.assertTrue(self.quadcopter.change_overall_throttle(50))
 
@@ -239,7 +243,7 @@ class TestControlQuadcopter(unittest.TestCase):
         self.assertIs(self.quadcopter._motor_rear_left.current_throttle, 60)
 
     def test_change_tilt_rear_left(self):
-        """ Tests changing the tilt """
+        """ Tests changing the tilt to the rear left """
         self.assertTrue(self.quadcopter.turn_on())
         self.assertTrue(self.quadcopter.change_overall_throttle(50))
 
@@ -250,6 +254,29 @@ class TestControlQuadcopter(unittest.TestCase):
         self.assertIs(self.quadcopter._motor_front_right.current_throttle, 60)
         self.assertIs(self.quadcopter._motor_rear_right.current_throttle, 50)
         self.assertIs(self.quadcopter._motor_rear_left.current_throttle, 40)
+
+    def test_change_tilt_fail(self):
+        """ Tests changing the tilt to an invalid value - expected to fail """
+        self.assertTrue(self.quadcopter.turn_on())
+        self.assertTrue(self.quadcopter.change_overall_throttle(50))
+
+        self.assertFalse(self.quadcopter.change_tilt(
+            side=self.quadcopter.TiltSide.front_right,
+            adjustment=-200))
+
+    def test_hover(self):
+        """ Tests hover """
+        self.assertTrue(self.quadcopter.turn_on())
+        self.assertTrue(self.quadcopter.change_overall_throttle(50))
+        self.assertTrue(self.quadcopter.change_yaw(20))
+        self.assertTrue(self.quadcopter.change_tilt(
+            self.quadcopter.TiltSide.left, -30))
+        self.assertTrue(self.quadcopter.hover())
+
+        self.assertIs(self.quadcopter._motor_front_left.current_throttle, 50)
+        self.assertIs(self.quadcopter._motor_front_right.current_throttle, 50)
+        self.assertIs(self.quadcopter._motor_rear_right.current_throttle, 50)
+        self.assertIs(self.quadcopter._motor_rear_left.current_throttle, 50)
 
     # ########################################################################
     # def test_auto_daemon_spawn(self):

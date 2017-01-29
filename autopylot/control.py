@@ -431,7 +431,7 @@ class Quadcopter():
     def change_overall_throttle(self, throttle):
         """ Sends a throttle (%) adjustement to all motors. Valid value is
         between -100% to +100% """
-        overall_sucess = True
+        overall_success = True
         try:
             for motor in self._for_each_motor():
                 success = motor.send_throttle_adjustment(throttle)
@@ -439,12 +439,42 @@ class Quadcopter():
                     logging.critical("Unable to send throttle (%) adjustment "
                                      "({!s}) to motor: {!s}"
                                      .format(throttle, motor.__dict__))
-                    overall_sucess = False
+                    overall_success = False
         except Exception as e:
             logging.exception("Exception occured while sending throttle "
                               "adjustment to the motors: {!s}".format(e))
-            overall_sucess = False
-        return overall_sucess
+            overall_success = False
+        return overall_success
+
+    def hover(self):
+        """ Reads the current throttle of each motor and sets them to an equal
+        level so the quadcopter should hover """
+        # TODO: include sensor data in the processing here... (outline it
+        # into another function / task)
+
+        # NOTE: this is first very primitive because we will only set the
+        # throttle to a equal level so it should hover (but only in an
+        # environment without wind and stuff like that...)
+        overall_success = True
+        try:
+            total_throttle = 0
+            for motor in self._for_each_motor():
+                total_throttle += motor.current_throttle
+
+            throttle_foreach = int(total_throttle / 4)
+            for motor in self._for_each_motor():
+                success = motor.send_throttle(throttle_foreach)
+                if not success:
+                    logging.critical("Unable to send (absolute %) throttle "
+                                     "({!s}) to motor: {!s}"
+                                     .format(throttle_foreach, motor.__dict__))
+                    overall_success = False
+        except Exception as e:
+            logging.exception("Exception occured while trying to bring the "
+                              "motors on one level to hover: {!s}".format(e))
+            overall_success = False
+
+        return overall_success
 
     def change_yaw(self, absolute_yaw):
         """ Sends throttle (%) adjustements to the motors that result in a yaw.
@@ -463,7 +493,7 @@ class Quadcopter():
                           .format(absolute_yaw))
             return False
 
-        overall_sucess = True
+        overall_success = True
         try:
             for motor in self._for_each_motor():
                 change_for_yaw = motor.current_throttle / 100 * absolute_yaw
@@ -478,17 +508,17 @@ class Quadcopter():
 
                 success = motor.send_throttle_adjustment(change_for_yaw)
                 if not success:
-                    overall_sucess = False
+                    overall_success = False
                     logging.critical("Unable to send throttle adjustment for "
                                      "yaw ({!s}) to motor: {!s}"
                                      .format(absolute_yaw, motor.__dict__))
         except Exception as e:
-            overall_sucess = False
+            overall_success = False
             logging.exception("Exception occured while sending throttle "
                               "adjustment to motors to perform yaw: {!s}"
                               .format(e))
             return False
-        return overall_sucess
+        return overall_success
 
     def change_tilt(self, side, adjustment):
         """ Change the tilt to the given side (front, left, frontleft,
@@ -496,7 +526,7 @@ class Quadcopter():
         Valid values for adjustment: -100% to +100%.
         I.e. you want to change tilt to rear you have to send: side=front
         and a negative adjustment value """
-        overall_sucess = True
+        overall_success = True
         try:
             ###################################################################
             # create a throttle list for the specific case
@@ -526,25 +556,25 @@ class Quadcopter():
                 logging.error("Invalid side value ({!s}). Can not compute the "
                               "motor throttle adjustments with this."
                               .format(side))
-                overall_sucess = False
+                overall_success = False
             success = self._change_throttle_by_list(throttle_list)
             if not success:
                 logging.critical("Changing tilt was not successful. "
                                  "Something went wrong when changing "
                                  "tilt by throttle list.")
-                overall_sucess = False
+                overall_success = False
         except Exception as e:
             logging.exception("Exception occured while changing tilt: {!s}"
                               .format(e))
-            overall_sucess = False
-        return overall_sucess
+            overall_success = False
+        return overall_success
 
     def _change_throttle_by_list(self, throttle_list):
         """ Change the throttle proportional (i.e. 50% of 50% current throttle
         -> 75% new current throttle) of each motor to
         by throttle_list (format => [front_left, front_right,
         rear_right, rear_left]). Valid values: -100% to +100% """
-        overall_sucess = True
+        overall_success = True
 
         if not throttle_list or len(throttle_list) == 0:
             logging.warning("throttle list did not include any values."
@@ -567,18 +597,18 @@ class Quadcopter():
             for index, throttle in enumerate(throttle_list):
                 motor = get_motor_by_index(index)
                 if throttle < -100 or throttle > 100:
-                    overall_sucess = False
+                    overall_success = False
                     logging.error("throttle (%) adjustment ({!s}) for "
                                   "motor ({!s}) not within range (+-100%)"
                                   .format(throttle, motor.__dict__))
                 throttle_adj = motor.current_throttle / 100 * throttle
                 success = motor.send_throttle_adjustment(throttle_adj)
                 if not success:
-                    overall_sucess = False
+                    overall_success = False
                     logging.critical("Unable to send throttle (%) "
                                      "adjustment ({!s}) for motor: {!s}"
                                      .format(throttle, motor.__dict__))
         except Exception as e:
             logging.exception("Exception occured while changing tilt (by "
                               "throttle list): {!s}".format(e))
-        return overall_sucess
+        return overall_success

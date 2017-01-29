@@ -54,6 +54,7 @@ def verify_config_ini(config_ini):
 
 
 config = configparser.ConfigParser()
+# TODO: find a better place for the config.ini file
 config.read(os.path.dirname(__file__) + '/config.ini')
 if len(config.sections()) == 0:
     raise Exception("No configuration set in the file config.ini")

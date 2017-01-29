@@ -6,6 +6,7 @@ import os
 import time
 import logging
 import subprocess
+import enum
 
 # pip installed modules
 import psutil
@@ -16,9 +17,9 @@ import pigpio
 import autopylot.sensor
 import autopylot.config
 
-###############################################
+###############################################################################
 # PRINCIPLE OF BEHAVIOR
-###############################################
+###############################################################################
 # The user should only be able to send suggestions to the drone.
 # The drone should always verify this and check if it is safe to do so. If yes
 # it could proceed with this action and if not it should self decide what to
@@ -28,18 +29,18 @@ import autopylot.config
 # Always expect components to fails
 # Expect the unexpected
 # Priority Nr. 1: Be responsive and stay alive
-###############################################
+###############################################################################
 
-################################################
-# LIST OF TODOs                                #
-################################################
+###############################################################################
+# LIST OF TODOs
+###############################################################################
 # TODO implement controls (like changing tilt, or yaw)
 # TODO add a worst case scenario handling for example if the gyro sensor
 # fails in mid fly... or one / several motors stop responding.
 # TODO: Write a wrapper for the gyrosensor so it is easier to change it later
 #  to another module or sensor...
 #
-################################################
+###############################################################################
 
 
 class Motor():
@@ -128,13 +129,13 @@ class Motor():
         self._gpio_callback = self.pi.callback(self.pin, pigpio.EITHER_EDGE,
                                                callback_func)
 
-        # *******************************************************
+        #######################################################################
         # set a watchdog to the pin - the servo pulsewidth should be sent
         # periodically - so the watchdog would only trigger when there
         # is an unexpected behavior...
-        # *******************************************************
-
+        #
         # set watchdog to 10ms (because we need full control over the motor)
+        # #####################################################################
         wd_timeout_ms = 10
         self.pi.set_watchdog(self.pin, wd_timeout_ms)
         logging.info("Activated a watchdog (timeout: {!s}ms) and callback for "
@@ -165,10 +166,12 @@ class Motor():
     def _convert_percent_to_actual_value(self, percent_val):
         """ Converts the percentage (throttle) value to the actual value.
         1% => min throttle and 100% => max throttle """
+        #######################################################################
         # 1% => Min throttle
         # 100% => Max Throttle
         # these values are precalculated (and stored in a dict)
         # for faster computation
+        #######################################################################
         verified_value = percent_val
         if percent_val not in range(0, 101):
             logging.error("percent_val ({!s}) was not within the valid "
@@ -273,6 +276,13 @@ class Motor():
 
 class Quadcopter():
     """ Class to control the quadcopter """
+
+    class TiltSide(enum.Enum):
+        """ Enum to indicate the side which to tilt """
+        front = 1
+        left = 2
+        front_left = 3
+        front_right = 4
 
     def __init__(self):
         pigpiod_running = self._is_daemon_running()
@@ -480,44 +490,95 @@ class Quadcopter():
             return False
         return overall_sucess
 
-    # NOTE: This interface is shit.
-    # It should only be able to send tilt changes like: front, front_left,
-    # front_right or rear_left, rear, rear_right
-    # The user should not send its own values here (not in THIS interface)
+    def change_tilt(self, side, adjustment):
+        """ Change the tilt to the given side (front, left, frontleft,
+        frontright) - to use the opssite side just use a negative value.
+        Valid values for adjustment: -100% to +100%.
+        I.e. you want to change tilt to rear you have to send: side=front
+        and a negative adjustment value """
+        overall_sucess = True
+        try:
+            ###################################################################
+            # create a throttle list for the specific case
+            # throttle list:
+            # [0] = front_left
+            # [1] = front_right
+            # [2] = rear_right
+            # [3] = rear_left
+            ###################################################################
+            throttle_list = []
+            alternate_adj = adjustment * (-1)
+            if side == self.TiltSide.front:
+                # same adjustments for motor front_left and front_right
+                # same adjustments for motor rear_left and rear_right
+                throttle_list = [alternate_adj, alternate_adj, adjustment,
+                                 adjustment]
+            elif side == self.TiltSide.left:
+                # same adjustments for motor front_left and rear_left
+                throttle_list = [alternate_adj, adjustment, adjustment,
+                                 alternate_adj]
+            elif side == self.TiltSide.front_left:
+                # only front_left and rear_right
+                throttle_list = [alternate_adj, 0, adjustment, 0]
+            elif side == self.TiltSide.front_right:
+                throttle_list = [0, alternate_adj, 0, adjustment]
+            else:
+                logging.error("Invalid side value ({!s}). Can not compute the "
+                              "motor throttle adjustments with this."
+                              .format(side))
+                overall_sucess = False
+            success = self._change_throttle_by_list(throttle_list)
+            if not success:
+                logging.critical("Changing tilt was not successful. "
+                                 "Something went wrong when changing "
+                                 "tilt by throttle list.")
+                overall_sucess = False
+        except Exception as e:
+            logging.exception("Exception occured while changing tilt: {!s}"
+                              .format(e))
+            overall_sucess = False
+        return overall_sucess
 
-    # def change_tilt(self, throttle_list):
-    #     """ Change the tilt by adjusting the throttle (%) of each motor to
-    #     the throttle_list (format => [front_left, front_right,
-    #     rear_right, rear_left]). Valid values: -100% to +100% """
-    #     overall_sucess = True
-    #
-    #     def get_motor_by_index(index):
-    #         if index == 0:
-    #             return self._motor_front_left
-    #         elif index == 1:
-    #             return self._motor_front_right
-    #         elif index == 2:
-    #             return self._motor_rear_right
-    #         elif index == 3:
-    #             return self._motor_rear_left
-    #         else:
-    #             raise Exception("Index for motor out of range "
-    #                             "({!s})".format(index))
-    #     try:
-    #         for index, throttle in enumerate(throttle_list):
-    #             motor = get_motor_by_index(index)
-    #             if throttle < 100 or throttle > 100:
-    #                 overall_sucess = False
-    #                 logging.error("throttle (%) adjustment ({!s}) for "
-    #                               "motor ({!s}) not within range (+-100%)"
-    #                               .format(throttle, motor.__dict__))
-    #             success = motor.send_throttle_adjustment(throttle)
-    #             if not success:
-    #                 overall_sucess = False
-    #                 logging.critical("Unable to send throttle (%) "
-    #                                  "adjustment ({!s}) for motor: {!s}"
-    #                                  .format(throttle, motor.__dict__))
-    #     except Exception as e:
-    #         logging.exception("Exception occured while changing tilt: {!s}"
-    #                           .format(e))
-    #     return overall_sucess
+    def _change_throttle_by_list(self, throttle_list):
+        """ Change the throttle proportional (i.e. 50% of 50% current throttle
+        -> 75% new current throttle) of each motor to
+        by throttle_list (format => [front_left, front_right,
+        rear_right, rear_left]). Valid values: -100% to +100% """
+        overall_sucess = True
+
+        if not throttle_list or len(throttle_list) == 0:
+            logging.warning("throttle list did not include any values."
+                            "Thus there did not happen any adjustments")
+            return False
+
+        def get_motor_by_index(index):
+            if index == 0:
+                return self._motor_front_left
+            elif index == 1:
+                return self._motor_front_right
+            elif index == 2:
+                return self._motor_rear_right
+            elif index == 3:
+                return self._motor_rear_left
+            else:
+                raise Exception("Index for motor out of range "
+                                "({!s})".format(index))
+        try:
+            for index, throttle in enumerate(throttle_list):
+                motor = get_motor_by_index(index)
+                if throttle < -100 or throttle > 100:
+                    overall_sucess = False
+                    logging.error("throttle (%) adjustment ({!s}) for "
+                                  "motor ({!s}) not within range (+-100%)"
+                                  .format(throttle, motor.__dict__))
+                throttle_adj = motor.current_throttle / 100 * throttle
+                success = motor.send_throttle_adjustment(throttle_adj)
+                if not success:
+                    overall_sucess = False
+                    logging.critical("Unable to send throttle (%) "
+                                     "adjustment ({!s}) for motor: {!s}"
+                                     .format(throttle, motor.__dict__))
+        except Exception as e:
+            logging.exception("Exception occured while changing tilt (by "
+                              "throttle list): {!s}".format(e))
+        return overall_sucess

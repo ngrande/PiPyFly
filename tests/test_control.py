@@ -186,6 +186,71 @@ class TestControlQuadcopter(unittest.TestCase):
         self.assertTrue(self.quadcopter.change_yaw(-20))
         self.assertTrue(self.quadcopter.change_yaw(0))
 
+    def test_change_throttle_by_list(self):
+        """ Tests if the throttle list for adjustments to each motor is
+        interpreted correctly and each motor received the change """
+        self.assertTrue(self.quadcopter.turn_on())
+        self.assertTrue(self.quadcopter.change_overall_throttle(50))
+        # throttle list: [fl, fr, rr, rl]
+        throttle_list = [0, 10, -20, 30]
+        self.assertTrue(self.quadcopter._change_throttle_by_list(
+            throttle_list))
+        self.assertIs(self.quadcopter._motor_front_left.current_throttle, 50)
+        self.assertIs(self.quadcopter._motor_front_right.current_throttle, 55)
+        self.assertIs(self.quadcopter._motor_rear_right.current_throttle, 40)
+        self.assertIs(self.quadcopter._motor_rear_left.current_throttle, 65)
+
+    def test_change_tilt_front(self):
+        """ Tests changing the tilt """
+        self.assertTrue(self.quadcopter.turn_on())
+        self.assertTrue(self.quadcopter.change_overall_throttle(50))
+
+        self.assertTrue(self.quadcopter.change_tilt(
+            side=self.quadcopter.TiltSide.front, adjustment=20))
+        self.assertIs(self.quadcopter._motor_front_left.current_throttle, 40)
+        self.assertIs(self.quadcopter._motor_front_right.current_throttle, 40)
+        self.assertIs(self.quadcopter._motor_rear_right.current_throttle, 60)
+        self.assertIs(self.quadcopter._motor_rear_left.current_throttle, 60)
+
+    def test_change_tilt_front_left(self):
+        """ Tests changing the tilt """
+        self.assertTrue(self.quadcopter.turn_on())
+        self.assertTrue(self.quadcopter.change_overall_throttle(50))
+
+        self.assertTrue(self.quadcopter.change_tilt(
+            side=self.quadcopter.TiltSide.front_left,
+            adjustment=20))
+        self.assertIs(self.quadcopter._motor_front_left.current_throttle, 40)
+        self.assertIs(self.quadcopter._motor_front_right.current_throttle, 50)
+        self.assertIs(self.quadcopter._motor_rear_right.current_throttle, 60)
+        self.assertIs(self.quadcopter._motor_rear_left.current_throttle, 50)
+
+    def test_change_tilt_front_right(self):
+        """ Tests changing the tilt """
+        self.assertTrue(self.quadcopter.turn_on())
+        self.assertTrue(self.quadcopter.change_overall_throttle(50))
+
+        self.assertTrue(self.quadcopter.change_tilt(
+            side=self.quadcopter.TiltSide.front_right,
+            adjustment=20))
+        self.assertIs(self.quadcopter._motor_front_left.current_throttle, 50)
+        self.assertIs(self.quadcopter._motor_front_right.current_throttle, 40)
+        self.assertIs(self.quadcopter._motor_rear_right.current_throttle, 50)
+        self.assertIs(self.quadcopter._motor_rear_left.current_throttle, 60)
+
+    def test_change_tilt_rear_left(self):
+        """ Tests changing the tilt """
+        self.assertTrue(self.quadcopter.turn_on())
+        self.assertTrue(self.quadcopter.change_overall_throttle(50))
+
+        self.assertTrue(self.quadcopter.change_tilt(
+            side=self.quadcopter.TiltSide.front_right,
+            adjustment=-20))
+        self.assertIs(self.quadcopter._motor_front_left.current_throttle, 50)
+        self.assertIs(self.quadcopter._motor_front_right.current_throttle, 60)
+        self.assertIs(self.quadcopter._motor_rear_right.current_throttle, 50)
+        self.assertIs(self.quadcopter._motor_rear_left.current_throttle, 40)
+
     # ########################################################################
     # def test_auto_daemon_spawn(self):
     #     """ Tests if the Quadcopter automatically spawns the pigpiod daemon

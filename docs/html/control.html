@@ -19,12 +19,13 @@ All&nbsp;pins&nbsp;here&nbsp;are&nbsp;referenced&nbsp;by&nbsp;the&nbsp;BCM&nbsp;
     
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="autopylot.html">autopylot</a><br>
-<a href="logging.html">logging</a><br>
-</td><td width="25%" valign=top><a href="os.html">os</a><br>
-<a href="pigpio.html">pigpio</a><br>
-</td><td width="25%" valign=top><a href="psutil.html">psutil</a><br>
-<a href="subprocess.html">subprocess</a><br>
-</td><td width="25%" valign=top><a href="time.html">time</a><br>
+<a href="enum.html">enum</a><br>
+</td><td width="25%" valign=top><a href="logging.html">logging</a><br>
+<a href="os.html">os</a><br>
+</td><td width="25%" valign=top><a href="pigpio.html">pigpio</a><br>
+<a href="psutil.html">psutil</a><br>
+</td><td width="25%" valign=top><a href="subprocess.html">subprocess</a><br>
+<a href="time.html">time</a><br>
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
@@ -95,6 +96,12 @@ Data descriptors defined here:<br>
 <dl><dt><a name="Quadcopter-change_overall_throttle"><strong>change_overall_throttle</strong></a>(self, throttle)</dt><dd><tt>Sends&nbsp;a&nbsp;throttle&nbsp;(%)&nbsp;adjustement&nbsp;to&nbsp;all&nbsp;motors.&nbsp;Valid&nbsp;value&nbsp;is<br>
 between&nbsp;-100%&nbsp;to&nbsp;+100%</tt></dd></dl>
 
+<dl><dt><a name="Quadcopter-change_tilt"><strong>change_tilt</strong></a>(self, side, adjustment)</dt><dd><tt>Change&nbsp;the&nbsp;tilt&nbsp;to&nbsp;the&nbsp;given&nbsp;side&nbsp;(front,&nbsp;left,&nbsp;frontleft,<br>
+frontright)&nbsp;-&nbsp;to&nbsp;use&nbsp;the&nbsp;opssite&nbsp;side&nbsp;just&nbsp;use&nbsp;a&nbsp;negative&nbsp;value.<br>
+Valid&nbsp;values&nbsp;for&nbsp;adjustment:&nbsp;-100%&nbsp;to&nbsp;+100%.<br>
+I.e.&nbsp;you&nbsp;want&nbsp;to&nbsp;change&nbsp;tilt&nbsp;to&nbsp;rear&nbsp;you&nbsp;have&nbsp;to&nbsp;send:&nbsp;side=front<br>
+and&nbsp;a&nbsp;negative&nbsp;adjustment&nbsp;value</tt></dd></dl>
+
 <dl><dt><a name="Quadcopter-change_yaw"><strong>change_yaw</strong></a>(self, absolute_yaw)</dt><dd><tt>Sends&nbsp;throttle&nbsp;(%)&nbsp;adjustements&nbsp;to&nbsp;the&nbsp;motors&nbsp;that&nbsp;result&nbsp;in&nbsp;a&nbsp;yaw.<br>
 If&nbsp;the&nbsp;value&nbsp;is&nbsp;positive&nbsp;it&nbsp;will&nbsp;yaw&nbsp;clockwise&nbsp;and&nbsp;otherwise<br>
 counterclockwise.&nbsp;Valid&nbsp;value&nbsp;is&nbsp;between&nbsp;-100&nbsp;to&nbsp;+100%.&nbsp;This&nbsp;will<br>
@@ -112,5 +119,9 @@ Data descriptors defined here:<br>
 <dl><dt><strong>__weakref__</strong></dt>
 <dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>TiltSide</strong> = &lt;enum 'TiltSide'&gt;<dd><tt>Enum&nbsp;to&nbsp;indicate&nbsp;the&nbsp;side&nbsp;which&nbsp;to&nbsp;tilt</tt></dl>
+
 </td></tr></table></td></tr></table>
 </body></html>

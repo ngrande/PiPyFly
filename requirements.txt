@@ -1,3 +1,4 @@
 pigpio
 mpu6050-raspberrypi
 psutil
+cherrypy

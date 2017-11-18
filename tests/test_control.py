@@ -276,6 +276,51 @@ class TestControlQuadcopter(unittest.TestCase):
 		self.assertIs(self.quadcopter._motor_rear_right.current_throttle, 50)
 		self.assertIs(self.quadcopter._motor_rear_left.current_throttle, 50)
 
+	def test_request_total_throttle(self):
+		""" Test requesting total throttle """
+		self.assertTrue(self.quadcopter.turn_on())
+		self.assertTrue(self.quadcopter.change_overall_throttle(100))
+		self.assertEqual(self.quadcopter.request_total_throttle(), 400)
+
+	def test_request_throttle(self):
+		""" Test requesting throttle of each individual motor """
+		self.assertTrue(self.quadcopter.turn_on())
+		self.assertTrue(self.quadcopter.change_overall_throttle(50))
+		self.assertIs(self.quadcopter.request_throttle(self.quadcopter.MotorSide.front_left), 50)
+		self.assertIs(self.quadcopter.request_throttle(self.quadcopter.MotorSide.rear_left), 50)
+		self.assertIs(self.quadcopter.request_throttle(self.quadcopter.MotorSide.front_right), 50)
+		self.assertIs(self.quadcopter.request_throttle(self.quadcopter.MotorSide.rear_right), 50)
+
+		self.assertTrue(self.quadcopter.change_tilt(self.quadcopter.TiltSide.front, 50))
+		self.assertIs(self.quadcopter.request_throttle(self.quadcopter.MotorSide.front_left), 25)
+		self.assertIs(self.quadcopter.request_throttle(self.quadcopter.MotorSide.rear_left), 75)
+		self.assertIs(self.quadcopter.request_throttle(self.quadcopter.MotorSide.front_right), 25)
+		self.assertIs(self.quadcopter.request_throttle(self.quadcopter.MotorSide.rear_right), 75)
+
+
+	def test_tilt_edge_case(self):
+		""" test tilt edge case - when already at 100 throttle """
+		self.assertTrue(self.quadcopter.turn_on())
+		self.assertTrue(self.quadcopter.change_overall_throttle(100))
+		self.assertFalse(self.quadcopter.change_tilt(self.quadcopter.TiltSide.front, 50))
+		self.assertIs(self.quadcopter.request_throttle(self.quadcopter.MotorSide.front_left), 50)
+		self.assertIs(self.quadcopter.request_throttle(self.quadcopter.MotorSide.rear_left), 100)
+		self.assertIs(self.quadcopter.request_throttle(self.quadcopter.MotorSide.front_right), 50)
+		self.assertIs(self.quadcopter.request_throttle(self.quadcopter.MotorSide.rear_right), 100)
+
+	def test_yaw_edge_case(self):
+		""" test yaw edge case - when already at 100 throttle """
+		self.assertTrue(self.quadcopter.turn_on())
+		self.assertTrue(self.quadcopter.change_overall_throttle(100))
+		self.assertFalse(self.quadcopter.change_yaw(10))
+
+		for motor in self.quadcopter._for_each_motor():
+			if motor.cw_rotation:
+				self.assertIs(motor.current_throttle, 100)
+			else:
+				self.assertIs(motor.current_throttle, 90)
+
+	
 	# ########################################################################
 	# def test_auto_daemon_spawn(self):
 	#     """ Tests if the Quadcopter automatically spawns the pigpiod daemon

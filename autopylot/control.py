@@ -298,6 +298,12 @@ class Quadcopter():
 		front_left = 3
 		front_right = 4
 
+	class MotorSide(enum.Enum):
+		front_right = 1
+		rear_right = 2
+		rear_left = 3
+		front_left = 4
+
 	def __init__(self):
 		pigpiod_running = self._is_daemon_running()
 		if not pigpiod_running:
@@ -460,12 +466,24 @@ class Quadcopter():
 		return overall_success
 
 
-	def _get_total_throttle(self):
+	def request_total_throttle(self):
 		""" return the total throttle (all throttle values combined) """
 		total_throttle = 0
 		for motor in self._for_each_motor():
 			total_throttle += motor.current_throttle
 		return total_throttle
+
+
+	def request_throttle(self, motor_side):
+		""" return the throttle value of the motor """
+		if motor_side is self.MotorSide.front_left:
+			return self._motor_front_left.current_throttle
+		elif motor_side is self.MotorSide.front_right:
+			return self._motor_front_right.current_throttle
+		elif motor_side is self.MotorSide.rear_right:
+			return self._motor_rear_right.current_throttle
+		elif motor_side is self.MotorSide.rear_left:
+			return self._motor_rear_left.current_throttle
 
 
 	def hover(self):
@@ -479,7 +497,7 @@ class Quadcopter():
 		# environment without wind and stuff like that...)
 		overall_success = True
 		try:
-			total_throttle = self._get_total_throttle()
+			total_throttle = self.request_total_throttle()
 
 			throttle_foreach = total_throttle / 4
 			for motor in self._for_each_motor():
@@ -491,7 +509,7 @@ class Quadcopter():
 					overall_success = False
 
 			if overall_success:
-				assert total_throttle == self._get_total_throttle(), "Total throttle should always stay consistent"
+				assert total_throttle == self.request_total_throttle(), "Total throttle should always stay consistent"
 		except Exception as e:
 			logging.exception("Exception occurred while trying to bring the "
 							"motors on one level to hover: {!s}".format(e))
@@ -519,7 +537,7 @@ class Quadcopter():
 
 		overall_success = True
 		try:
-			total_throttle = self._get_total_throttle()
+			total_throttle = self.request_total_throttle()
 			base_throttle = total_throttle / 4
 			factor = base_throttle / 100 * absolute_yaw
 			
@@ -533,7 +551,7 @@ class Quadcopter():
 				overall_success = motor.send_throttle(new_throttle)
 
 			if overall_success:
-				assert total_throttle == self._get_total_throttle(), "Total throttle should always stay consistent"
+				assert total_throttle == self.request_total_throttle(), "Total throttle should always stay consistent"
 		except Exception as e:
 			overall_success = False
 			logging.exception("Exception occured while sending throttle "
@@ -552,7 +570,7 @@ class Quadcopter():
 		adjustment = int(adjustment)
 		overall_success = True
 		try:
-			total_throttle = self._get_total_throttle()
+			total_throttle = self.request_total_throttle()
 			base_throttle = total_throttle / 4
 			factor = base_throttle / 100 * adjustment
 
@@ -575,7 +593,7 @@ class Quadcopter():
 				overall_success = self._motor_rear_left.send_throttle(base_throttle + factor)
 
 			if overall_success:
-				assert total_throttle == self._get_total_throttle(), "Total throttle should always stay consistent"
+				assert total_throttle == self.request_total_throttle(), "Total throttle should always stay consistent"
 		except Exception as e:
 			logging.exception("Exception occured while changing tilt: {!s}"
 							.format(e))

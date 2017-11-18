@@ -299,6 +299,7 @@ class Quadcopter():
 			# no connection to the GPIO pins possible...
 			raise Exception("Unable to connect to the GPIO pins. Is the daemon running?")
 
+		# TODO: gyro sensor is not used here atm
 		self._gyro_sensor = self._init_gyrosensor()
 		# TODO add check if gyro is started properly...
 		self.min_throttle = autopylot.config.get_min_throttle()

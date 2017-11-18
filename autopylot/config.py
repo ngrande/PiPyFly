@@ -140,6 +140,8 @@ def get_log_level():
 		return logging.CRITICAL
 	elif log_level_str == 'notset':
 		return logging.NOTSET
+	else:
+		return logging.NOTSET
 
 
 def get_log_output_file():

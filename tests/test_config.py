@@ -97,3 +97,5 @@ class TestControlMotor(unittest.TestCase):
 
 if __name__ == '__main__':
 		unittest.main()
+
+# vim: tabstop=4 shiftwidth=4 noexpandtab

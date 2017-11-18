@@ -48,24 +48,24 @@ class TestControlMotor(unittest.TestCase):
 		# should always succeed
 		self.assertTrue(self.motor.send_stop_signal())
 
-	def test_send_throttle_adjustment(self):
-		""" Tests the throttle % adjustment sending.
-		Will perform a motor start, an normal adjustment, a too high adjustment
-		and a too low adjustment. """
-		self.assertTrue(self.motor.send_start_signal())
-		self.assertTrue(self.motor.send_throttle_adjustment(10))
-		self.assertTrue(self.motor.send_throttle_adjustment(90))
-		self.assertFalse(self.motor.send_throttle_adjustment(1))
-		# should fail because we already sent 100 and the maximum is 1890
-		# 100 + 1800 = 1900 = FAIL
-		# with self.assertRaises(Exception):
-		#     self.motor.send_throttle_adjustment(800)
-		# with self.assertRaises(Exception):
-		#     self.motor.send_throttle_adjustment(-200)
-		self.assertFalse(self.motor.send_throttle_adjustment(800))
-		self.assertFalse(self.motor.send_throttle_adjustment(-200))
-		self.assertTrue(self.motor.send_stop_signal())
-		# self.assertTrue(self.motor.send_throttle_adjustment(760))
+	# def test_send_throttle_adjustment(self):
+	#     """ Tests the throttle % adjustment sending.
+	#     Will perform a motor start, an normal adjustment, a too high adjustment
+	#     and a too low adjustment. """
+	#     self.assertTrue(self.motor.send_start_signal())
+	#     self.assertTrue(self.motor.send_throttle_adjustment(10))
+	#     self.assertTrue(self.motor.send_throttle_adjustment(90))
+	#     self.assertFalse(self.motor.send_throttle_adjustment(1))
+	#     # should fail because we already sent 100 and the maximum is 1890
+	#     # 100 + 1800 = 1900 = FAIL
+	#     # with self.assertRaises(Exception):
+	#     #     self.motor.send_throttle_adjustment(800)
+	#     # with self.assertRaises(Exception):
+	#     #     self.motor.send_throttle_adjustment(-200)
+	#     self.assertFalse(self.motor.send_throttle_adjustment(800))
+	#     self.assertFalse(self.motor.send_throttle_adjustment(-200))
+	#     self.assertTrue(self.motor.send_stop_signal())
+	#     # self.assertTrue(self.motor.send_throttle_adjustment(760))
 
 	def test_send_throttle(self):
 		""" Tests the throttle % sending.
@@ -158,7 +158,7 @@ class TestControlQuadcopter(unittest.TestCase):
 		""" Tests changing the overall throttle of the quadcopter """
 		self.assertTrue(self.quadcopter.turn_on())
 		self.assertTrue(self.quadcopter.change_overall_throttle(20))
-		self.assertTrue(self.quadcopter.change_overall_throttle(-20))
+		self.assertFalse(self.quadcopter.change_overall_throttle(-20))
 		self.assertFalse(self.quadcopter.change_overall_throttle(-200))
 		self.assertTrue(self.quadcopter.change_overall_throttle(100))
 		self.assertTrue(self.quadcopter.change_overall_throttle(0))
@@ -189,13 +189,10 @@ class TestControlQuadcopter(unittest.TestCase):
 			else:
 				self.assertIs(motor.current_throttle, 40)
 
-		# TODO: this behaviour should be changed later
-		self.assertTrue(self.quadcopter.change_yaw(-20))
+		self.assertTrue(self.quadcopter.change_yaw(0))
 
 		for motor in self.quadcopter._for_each_motor():
-			self.assertIs(motor.current_throttle, 48)
-
-		self.assertTrue(self.quadcopter.change_yaw(0))
+			self.assertIs(motor.current_throttle, 50)
 
 		self.assertTrue(self.quadcopter.change_yaw(100))
 
@@ -204,20 +201,6 @@ class TestControlQuadcopter(unittest.TestCase):
 				self.assertIs(motor.current_throttle, 100)
 			else:
 				self.assertIs(motor.current_throttle, 0)
-
-	def test_change_throttle_by_list(self):
-		""" Tests if the throttle list for adjustments to each motor is
-		interpreted correctly and each motor received the change """
-		self.assertTrue(self.quadcopter.turn_on())
-		self.assertTrue(self.quadcopter.change_overall_throttle(50))
-		# throttle list: [fl, fr, rr, rl]
-		throttle_list = [0, 10, -20, 30]
-		self.assertTrue(self.quadcopter._change_throttle_by_list(
-			throttle_list))
-		self.assertIs(self.quadcopter._motor_front_left.current_throttle, 50)
-		self.assertIs(self.quadcopter._motor_front_right.current_throttle, 55)
-		self.assertIs(self.quadcopter._motor_rear_right.current_throttle, 40)
-		self.assertIs(self.quadcopter._motor_rear_left.current_throttle, 65)
 
 	def test_change_tilt_front(self):
 		""" Tests changing the tilt to the front """

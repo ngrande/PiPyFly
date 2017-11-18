@@ -1,5 +1,7 @@
-""" Module to provide easy access to the Quadcopter.
-All pins here are referenced by the BCM (Broadcom SOC channel) mapping """
+""" Low level module to provide (easy) access to the Quadcopter.
+All pins here are referenced by the BCM (Broadcom SOC channel) mapping.
+In this module you can change the throttle of the motors as you wish without
+any checks that prevent you from doing so - so be careful."""
 
 # standard modules
 import os
@@ -7,6 +9,7 @@ import time
 import logging
 import subprocess
 import enum
+import functools
 
 # pip installed modules
 import psutil
@@ -42,6 +45,13 @@ import autopylot.config
 #
 ###############################################################################
 
+# *****************
+# * READ FIRST
+# *****************
+# This is the LOW LEVEL module which gives you full control over the quadcopter
+# and does not interfere with what you wish to do. You can send the quad to heaven or death
+# however you please to do. Use a higher level module to have a secure access of control.
+#
 
 class Motor():
 	""" Class to control a single motor.
@@ -227,17 +237,17 @@ class Motor():
 							"to the pin {!s}".format(self.stop_signal, self.pin))
 			return False
 
-	@verify_motor_started
-	def send_throttle_adjustment(self, throttle_add):
-		""" increases / decreases the current throttle by the
-		throttle_add value (in percent %) """
-		new_total_throttle = int(self.current_throttle + throttle_add)
-		logging.info("Sending throttle adjustment of {!s}% to current "
-					"throttle {!s}%".format(throttle_add,
-											self.current_throttle))
-		# easier and cleaner when just using the general function
-		res = self.send_throttle(new_total_throttle)
-		return res
+	# @verify_motor_started
+	# def send_throttle_adjustment(self, throttle_add):
+	#     """ increases / decreases the current throttle by the
+	#     throttle_add value (in percent %) """
+	#     new_total_throttle = int(self.current_throttle + throttle_add)
+	#     logging.info("Sending throttle adjustment of {!s}% to current "
+	#                 "throttle {!s}%".format(throttle_add,
+	#                                         self.current_throttle))
+	#     # easier and cleaner when just using the general function
+	#     res = self.send_throttle(new_total_throttle)
+	#     return res
 
 	@verify_motor_started
 	@check_throttle_change
@@ -301,7 +311,6 @@ class Quadcopter():
 
 		# TODO: gyro sensor is not used here atm
 		self._gyro_sensor = self._init_gyrosensor()
-		# TODO add check if gyro is started properly...
 		self.min_throttle = autopylot.config.get_min_throttle()
 		self.max_throttle = autopylot.config.get_max_throttle()
 		# not sure about this value? Why 1000? Is this not motor specific?
@@ -438,7 +447,7 @@ class Quadcopter():
 		overall_success = True
 		try:
 			for motor in self._for_each_motor():
-				success = motor.send_throttle_adjustment(throttle)
+				success = motor.send_throttle(throttle)
 				if not success:
 					logging.critical("Unable to send throttle (%) adjustment "
 									"({!s}) to motor: {!s}"
@@ -449,6 +458,15 @@ class Quadcopter():
 							"adjustment to the motors: {!s}".format(e))
 			overall_success = False
 		return overall_success
+
+
+	def _get_total_throttle(self):
+		""" return the total throttle (all throttle values combined) """
+		total_throttle = 0
+		for motor in self._for_each_motor():
+			total_throttle += motor.current_throttle
+		return total_throttle
+
 
 	def hover(self):
 		""" Reads the current throttle of each motor and sets them to an equal
@@ -461,11 +479,9 @@ class Quadcopter():
 		# environment without wind and stuff like that...)
 		overall_success = True
 		try:
-			total_throttle = 0
-			for motor in self._for_each_motor():
-				total_throttle += motor.current_throttle
+			total_throttle = self._get_total_throttle()
 
-			throttle_foreach = int(total_throttle / 4)
+			throttle_foreach = total_throttle / 4
 			for motor in self._for_each_motor():
 				success = motor.send_throttle(throttle_foreach)
 				if not success:
@@ -473,6 +489,9 @@ class Quadcopter():
 									"({!s}) to motor: {!s}"
 									.format(throttle_foreach, motor.__dict__))
 					overall_success = False
+
+			if overall_success:
+				assert total_throttle == self._get_total_throttle(), "Total throttle should always stay consistent"
 		except Exception as e:
 			logging.exception("Exception occurred while trying to bring the "
 							"motors on one level to hover: {!s}".format(e))
@@ -500,23 +519,21 @@ class Quadcopter():
 
 		overall_success = True
 		try:
+			total_throttle = self._get_total_throttle()
+			base_throttle = total_throttle / 4
+			factor = base_throttle / 100 * absolute_yaw
+			
 			for motor in self._for_each_motor():
-				change_for_yaw = motor.current_throttle / 100 * absolute_yaw
-				if absolute_yaw > 0 and not motor.cw_rotation:  # clockwise yaw
-					# clockwise yaw
-					change_for_yaw *= -1
-				elif absolute_yaw < 0 and motor.cw_rotation:  # ccw yaw
-					# counterclockwise yaw
-					change_for_yaw *= -1
-				else:  # if 0
-					pass  # placeholder for later
+				new_throttle = None
+				if motor.cw_rotation:
+					new_throttle = base_throttle + factor
+				else:
+					new_throttle = base_throttle - factor
 
-				success = motor.send_throttle_adjustment(change_for_yaw)
-				if not success:
-					overall_success = False
-					logging.critical("Unable to send throttle adjustment for "
-									"yaw ({!s}) to motor: {!s}"
-									.format(absolute_yaw, motor.__dict__))
+				overall_success = motor.send_throttle(new_throttle)
+
+			if overall_success:
+				assert total_throttle == self._get_total_throttle(), "Total throttle should always stay consistent"
 		except Exception as e:
 			overall_success = False
 			logging.exception("Exception occured while sending throttle "
@@ -531,94 +548,38 @@ class Quadcopter():
 		Valid values for adjustment: -100% to +100%.
 		I.e. you want to change tilt to rear you have to send: side=front
 		and a negative adjustment value """
+		# 100% tilt => one side is on full speed - other side is on zero speed
 		adjustment = int(adjustment)
 		overall_success = True
 		try:
-			###################################################################
-			# create a throttle list for the specific case
-			# throttle list:
-			# [0] = front_left
-			# [1] = front_right
-			# [2] = rear_right
-			# [3] = rear_left
-			###################################################################
-			throttle_list = []
-			alternate_adj = adjustment * (-1)
-			if side == self.TiltSide.front:
-				# same adjustments for motor front_left and front_right
-				# same adjustments for motor rear_left and rear_right
-				throttle_list = [alternate_adj, alternate_adj, adjustment,
-								adjustment]
-			elif side == self.TiltSide.left:
-				# same adjustments for motor front_left and rear_left
-				throttle_list = [alternate_adj, adjustment, adjustment,
-								alternate_adj]
-			elif side == self.TiltSide.front_left:
-				# only front_left and rear_right
-				throttle_list = [alternate_adj, 0, adjustment, 0]
-			elif side == self.TiltSide.front_right:
-				throttle_list = [0, alternate_adj, 0, adjustment]
-			else:
-				logging.error("Invalid side value ({!s}). Can not compute the "
-							"motor throttle adjustments with this."
-							.format(side))
-				overall_success = False
-			success = self._change_throttle_by_list(throttle_list)
-			if not success:
-				logging.critical("Changing tilt was not successful. "
-								"Something went wrong when changing "
-								"tilt by throttle list.")
-				overall_success = False
+			total_throttle = self._get_total_throttle()
+			base_throttle = total_throttle / 4
+			factor = base_throttle / 100 * adjustment
+
+			if side is self.TiltSide.front:
+				overall_success = self._motor_front_right.send_throttle(base_throttle - factor)
+				overall_success = self._motor_front_left.send_throttle(base_throttle - factor)
+				overall_success = self._motor_rear_right.send_throttle(base_throttle + factor)
+				overall_success = self._motor_rear_left.send_throttle(base_throttle + factor)
+
+			elif side is self.TiltSide.front_left:
+				overall_success = self._motor_front_right.send_throttle(base_throttle)
+				overall_success = self._motor_front_left.send_throttle(base_throttle - factor)
+				overall_success = self._motor_rear_right.send_throttle(base_throttle + factor)
+				overall_success = self._motor_rear_left.send_throttle(base_throttle)
+
+			elif side is self.TiltSide.front_right:
+				overall_success = self._motor_front_right.send_throttle(base_throttle - factor)
+				overall_success = self._motor_front_left.send_throttle(base_throttle)
+				overall_success = self._motor_rear_right.send_throttle(base_throttle)
+				overall_success = self._motor_rear_left.send_throttle(base_throttle + factor)
+
+			if overall_success:
+				assert total_throttle == self._get_total_throttle(), "Total throttle should always stay consistent"
 		except Exception as e:
 			logging.exception("Exception occured while changing tilt: {!s}"
 							.format(e))
 			overall_success = False
-		return overall_success
-
-	def _change_throttle_by_list(self, throttle_list):
-		""" Change the throttle proportional (i.e. 50% of 50% current throttle
-		-> 75% new current throttle) of each motor to
-		by throttle_list (format => [front_left, front_right,
-		rear_right, rear_left]). Valid values: -100% to +100% """
-		throttle_list = list(throttle_list)
-		overall_success = True
-
-		if not throttle_list or len(throttle_list) == 0:
-			logging.warning("throttle list did not include any values."
-							"Thus there did not happen any adjustments")
-			return False
-
-		def get_motor_by_index(index):
-			if index == 0:
-				return self._motor_front_left
-			elif index == 1:
-				return self._motor_front_right
-			elif index == 2:
-				return self._motor_rear_right
-			elif index == 3:
-				return self._motor_rear_left
-			else:
-				raise Exception("Index for motor out of range "
-								"({!s})".format(index))
-		try:
-			for index, throttle in enumerate(throttle_list):
-				motor = get_motor_by_index(index)
-				# TODO: do we need this check here? Same as above...
-				if throttle < -100 or throttle > 100:
-					overall_success = False
-					logging.error("throttle (%) adjustment ({!s}) for "
-								"motor ({!s}) not within range (+-100%)"
-								.format(throttle, motor.__dict__))
-				throttle_adj = motor.current_throttle / 100 * throttle
-				success = motor.send_throttle_adjustment(throttle_adj)
-				if not success:
-					overall_success = False
-					logging.critical("Unable to send throttle (%) "
-									"adjustment ({!s}) for motor: {!s}"
-									.format(throttle, motor.__dict__))
-		except Exception as e:
-			logging.exception("Exception occured while changing tilt (by "
-							"throttle list): {!s}".format(e))
 		return overall_success
 
 # vim: tabstop=4 shiftwidth=4 noexpandtab

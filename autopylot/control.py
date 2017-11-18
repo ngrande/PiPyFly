@@ -37,21 +37,20 @@ import autopylot.config
 # TODO implement controls (like changing tilt, or yaw)
 # TODO add a worst case scenario handling for example if the gyro sensor
 # fails in mid fly... or one / several motors stop responding.
-# TODO: Write a wrapper for the gyrosensor so it is easier to change it later
+# TODO: Write a wrapper for the gyro sensor so it is easier to change it later
 #  to another module or sensor...
 #
 ###############################################################################
 
 
 class Motor():
-	""" Class to contorl a single motor.
+	""" Class to control a single motor.
 	There should not be a need to use this class - as it is
 	already used by the Quadcopter class which will handle this """
 
 	def __init__(self, pi, pin, cw_rotation, start_signal, stop_signal,
 				min_throttle, max_throttle):
 		if not pi:
-			logging.error("Pi = None. Unable to control the motor")
 			raise Exception("Pi = None. Unable to take control over the motor")
 		self.pi = pi
 		self.pin = int(pin)
@@ -63,7 +62,7 @@ class Motor():
 		self.current_throttle = 0  # in percent % (1% => min_throttle)
 		self._started = False
 		self._perc_value_map = self._create_perc_value_map(self.min_throttle,
-														self.max_throttle)
+															self.max_throttle)
 		# the callback return object - do not change this - it is private!
 		self._gpio_callback = None
 		logging.info("Created new instance of {!s} class with following "
@@ -79,10 +78,6 @@ class Motor():
 
 		def wrapper(self, *args):
 			if not self._started:
-				logging.error("Motor was not started properly before sending "
-							"an event. Please verify your code and usage of "
-							"the Motor class. Before throttling or simliar "
-							"one should send the start signal.")
 				raise Exception("Motor was not started (no start signal sent)."
 								" This could lead to damage of the hardware / "
 								"electronics or your environment.")
@@ -91,7 +86,7 @@ class Motor():
 
 	def check_throttle_change(func):
 		""" Wrapper to warn the user if the throttle change is too harsh
-		/ fast / could damge the motors """
+		/ fast / could damage the motors """
 
 		def wrapper(self, *args):
 			before_change = self.current_throttle
@@ -109,6 +104,7 @@ class Motor():
 		return wrapper
 
 	###########################################################################
+	# END
 	###########################################################################
 
 	def _register_gpio_watchdog(self):
@@ -123,7 +119,7 @@ class Motor():
 			if level == pigpio.TIMEOUT:
 				logging.warning("Timeout event triggered from watchdog on "
 								"pin: {!s} (tick: {!s}). Check the motor "
-								"responsivness or adjust the watchdog."
+								"responsiveness or adjust the watchdog."
 								.format(gpio, tick))
 
 		self._gpio_callback = self.pi.callback(self.pin, pigpio.EITHER_EDGE,
@@ -157,9 +153,16 @@ class Motor():
 		min throttle => 1% and max throttle => 100%. """
 		perc_to_value_dict = {}
 		step = (max_throttle - min_throttle) / 99
-		one_perc = min_throttle - step  # to let min throttl be 1%
-		for perc in range(0, 100 + 1):
+		one_perc = min_throttle - step  # to let min throttle be 1%
+		for perc in range(0, 101):  # the map should go from 1 to 100
 			perc_to_value_dict[perc] = int(one_perc + (step * perc))
+
+		# assert that dict is 101 long because we have 101 steps
+		# 0 = one stop under the min throttle
+		# 1 = min throttle
+		# 100 = max throttle
+		# sum: 101 values
+		assert len(perc_to_value_dict) == 100 + 1, "map is out of bounds"
 
 		return perc_to_value_dict
 
@@ -169,20 +172,20 @@ class Motor():
 		#######################################################################
 		# 1% => Min throttle
 		# 100% => Max Throttle
-		# these values are precalculated (and stored in a dict)
+		# these values are pre calculated (and stored in a dict)
 		# for faster computation
 		#######################################################################
-		verified_value = percent_val
+		normalized_value = percent_val
 		if percent_val not in range(0, 101):
 			logging.error("percent_val ({!s}) was not within the valid "
-						"range from 0 to 100.".format(percent_val))
+						"range from 1 to 100.".format(percent_val))
 			if percent_val < 0:
-				verified_value = 0
+				normalized_value = 0
 			elif percent_val > 100:
-				verified_value = 100
+				normalized_value = 100
 			logging.warning("changed the percent_val input from {!s} to a "
-							"valid {!s}".format(percent_val, verified_value))
-		actual_value = self._perc_value_map[verified_value]
+							"valid {!s}".format(percent_val, normalized_value))
+		actual_value = self._perc_value_map[normalized_value]
 		return actual_value
 
 	def send_start_signal(self):
@@ -201,8 +204,7 @@ class Motor():
 			return True
 		except Exception as e:
 			logging.exception("Eror while sending start signal ({!s}) "
-							"to the pin {!s}".format(self.start_signal,
-													self.pin))
+							"to the pin {!s}".format(self.start_signal, self.pin))
 			return False
 
 	def send_stop_signal(self):
@@ -222,8 +224,7 @@ class Motor():
 			return True
 		except Exception as e:
 			logging.exception("Error while sending stop signal ({!s}) "
-							"to the pin {!s}".format(self.stop_signal,
-													self.pin))
+							"to the pin {!s}".format(self.stop_signal, self.pin))
 			return False
 
 	@verify_motor_started
@@ -243,6 +244,9 @@ class Motor():
 	def send_throttle(self, throttle):
 		""" sets the current throttle (in percent %) to the new value """
 		throttle = int(throttle)
+		# TODO: think about not preventing a change below or above the 0 - to 100
+		# because how does the user later decide how much throttle is left?
+		# and we have a normalization in the _convert_percent_to_actual_value method
 		if throttle < 0:
 			text_error_too_low = "Can not set throttle ({!s}%) lower than " \
 				"0%".format(throttle, self.min_throttle)
@@ -287,22 +291,20 @@ class Quadcopter():
 	def __init__(self):
 		pigpiod_running = self._is_daemon_running()
 		if not pigpiod_running:
-			logging.error("pigpio daemon was not started successfully")
 			raise Exception("pigpiod daemon did not start properly. "
 							"Check permissions and / or if installed properly")
 		self.pi = pigpio.pi()
 		# TODO: call self.pi.stop() in the end...
 		if not self.pi.connected:
 			# no connection to the GPIO pins possible...
-			logging.error("Unable to connect to the GPIO pins (pigpio: {!s}). "
-						"Is the pigpiod daemon running?"
-						.format(self.pi.__dict__))
-			raise Exception("Unable to connecto to the GPIO pins")
+			raise Exception("Unable to connect to the GPIO pins. Is the daemon running?")
 
 		self._gyro_sensor = self._init_gyrosensor()
 		# TODO add check if gyro is started properly...
 		self.min_throttle = autopylot.config.get_min_throttle()
 		self.max_throttle = autopylot.config.get_max_throttle()
+		# not sure about this value? Why 1000? Is this not motor specific?
+		# Shouldn't it be configurable?
 		self.start_signal = 1000
 		self.stop_signal = 0
 		self._motor_front_left = self._init_motor(
@@ -330,7 +332,7 @@ class Quadcopter():
 					self.stop_signal, self.min_throttle, self.max_throttle)
 
 	def _check_motor_rotations(self):
-		""" Checks if the quadcopter will be able to stay still (rotaiton should
+		""" Checks if the quadcopter will be able to stay still (rotation should
 		be cw + ccw + cw + ccw) """
 		if (self._motor_front_left.cw_rotation ==
 				self._motor_front_right.cw_rotation):
@@ -431,6 +433,7 @@ class Quadcopter():
 	def change_overall_throttle(self, throttle):
 		""" Sends a throttle (%) adjustement to all motors. Valid value is
 		between -100% to +100% """
+		throttle = int(throttle)
 		overall_success = True
 		try:
 			for motor in self._for_each_motor():
@@ -470,14 +473,14 @@ class Quadcopter():
 									.format(throttle_foreach, motor.__dict__))
 					overall_success = False
 		except Exception as e:
-			logging.exception("Exception occured while trying to bring the "
+			logging.exception("Exception occurred while trying to bring the "
 							"motors on one level to hover: {!s}".format(e))
 			overall_success = False
 
 		return overall_success
 
 	def change_yaw(self, absolute_yaw):
-		""" Sends throttle (%) adjustements to the motors that result in a yaw.
+		""" Sends throttle (%) adjustments to the motors that result in a yaw.
 		If the value is positive it will yaw clockwise and otherwise
 		counterclockwise. Valid value is between -100 to +100%. This will
 		change the throttle of each motor proportional to the absolute_yaw """
@@ -488,6 +491,7 @@ class Quadcopter():
 		# motors are already at 100% throttle... the yaw will still work but
 		# not as fast or with a bit of altitude lose
 		# Change each motor independently (because it could be tilted)
+		absolute_yaw = int(absolute_yaw)
 		if absolute_yaw < -100 or absolute_yaw > 100:
 			logging.error("absolute_yaw exceeds +/- 100% ({!s})"
 						.format(absolute_yaw))
@@ -522,10 +526,11 @@ class Quadcopter():
 
 	def change_tilt(self, side, adjustment):
 		""" Change the tilt to the given side (front, left, frontleft,
-		frontright) - to use the opssite side just use a negative value.
+		frontright) - to use the opposite just use a negative value.
 		Valid values for adjustment: -100% to +100%.
 		I.e. you want to change tilt to rear you have to send: side=front
 		and a negative adjustment value """
+		adjustment = int(adjustment)
 		overall_success = True
 		try:
 			###################################################################
@@ -574,6 +579,7 @@ class Quadcopter():
 		-> 75% new current throttle) of each motor to
 		by throttle_list (format => [front_left, front_right,
 		rear_right, rear_left]). Valid values: -100% to +100% """
+		throttle_list = list(throttle_list)
 		overall_success = True
 
 		if not throttle_list or len(throttle_list) == 0:
@@ -596,6 +602,7 @@ class Quadcopter():
 		try:
 			for index, throttle in enumerate(throttle_list):
 				motor = get_motor_by_index(index)
+				# TODO: do we need this check here? Same as above...
 				if throttle < -100 or throttle > 100:
 					overall_success = False
 					logging.error("throttle (%) adjustment ({!s}) for "

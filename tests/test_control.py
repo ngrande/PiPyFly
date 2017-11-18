@@ -180,6 +180,7 @@ class TestControlQuadcopter(unittest.TestCase):
 		# a change of yaw and see if it was applied correctly
 		self.assertTrue(self.quadcopter.turn_on())
 		self.assertTrue(self.quadcopter.change_overall_throttle(50))
+		# TODO: change yaw(100) would result in stange settings... find a solution
 		self.assertTrue(self.quadcopter.change_yaw(20))
 
 		for motor in self.quadcopter._for_each_motor():
@@ -187,8 +188,22 @@ class TestControlQuadcopter(unittest.TestCase):
 				self.assertIs(motor.current_throttle, 60)
 			else:
 				self.assertIs(motor.current_throttle, 40)
+
+		# TODO: this behaviour should be changed later
 		self.assertTrue(self.quadcopter.change_yaw(-20))
+
+		for motor in self.quadcopter._for_each_motor():
+			self.assertIs(motor.current_throttle, 48)
+
 		self.assertTrue(self.quadcopter.change_yaw(0))
+
+		self.assertTrue(self.quadcopter.change_yaw(100))
+
+		for motor in self.quadcopter._for_each_motor():
+			if motor.cw_rotation:
+				self.assertIs(motor.current_throttle, 100)
+			else:
+				self.assertIs(motor.current_throttle, 0)
 
 	def test_change_throttle_by_list(self):
 		""" Tests if the throttle list for adjustments to each motor is

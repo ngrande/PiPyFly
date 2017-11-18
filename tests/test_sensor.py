@@ -22,7 +22,7 @@ class TestSensorGyrosensor(unittest.TestCase):
         temp = round(self.gyrosensor.get_sensor_temperature(), 0)
         # this test should be run in a room so i expect values
         # within "room temperature"
-        in_range = temp in range(18, 30)
+        in_range = temp in range(0, 60)
         self.assertTrue(in_range)
 
     def test_perform_selfcheck(self):

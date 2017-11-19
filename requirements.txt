@@ -2,3 +2,4 @@ pigpio
 mpu6050-raspberrypi
 psutil
 smbus-cffi
+urwid

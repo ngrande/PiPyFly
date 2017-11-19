@@ -315,6 +315,7 @@ class Quadcopter():
 			# no connection to the GPIO pins possible...
 			raise Exception("Unable to connect to the GPIO pins. Is the daemon running?")
 
+		self.turned_on = False
 		# TODO: gyro sensor is not used here atm
 		self._gyro_sensor = self._init_gyrosensor()
 		self.min_throttle = autopylot.config.get_min_throttle()
@@ -424,6 +425,7 @@ class Quadcopter():
 									.format(motor.__dict__))
 					overall_success = False
 			# self.pi.stop()
+			self.turned_on = False
 		except Exception as e:
 			logging.exception("Exception occurred while sending the start "
 							"signal to the motors: {!s}".format(e))
@@ -440,6 +442,7 @@ class Quadcopter():
 					logging.critical("Unable to start motor: {!s}"
 									.format(motor.__dict__))
 					overall_success = False
+			self.turned_on = True
 		except Exception as e:
 			logging.exception("Exception occurred while sending the start "
 							"signal to the motors: {!s}".format(e))
@@ -447,8 +450,8 @@ class Quadcopter():
 		return overall_success
 
 	def change_overall_throttle(self, throttle):
-		""" Sends a throttle (%) adjustement to all motors. Valid value is
-		between -100% to +100% """
+		""" changes the overall throttle. Valid value is
+		from 0 to 100 """
 		throttle = int(throttle)
 		overall_success = True
 		try:
@@ -518,10 +521,9 @@ class Quadcopter():
 		return overall_success
 
 	def change_yaw(self, absolute_yaw):
-		""" Sends throttle (%) adjustments to the motors that result in a yaw.
+		""" Change the yaw - valid values are from -100 to 100 where 100 is thehighest possible yawing.
 		If the value is positive it will yaw clockwise and otherwise
-		counterclockwise. Valid value is between -100 to +100%. This will
-		change the throttle of each motor proportional to the absolute_yaw """
+		counterclockwise. """
 		# TODO
 		# Edge cases:
 		# Motor could already be at 100% throttle
@@ -563,7 +565,7 @@ class Quadcopter():
 	def change_tilt(self, side, adjustment):
 		""" Change the tilt to the given side (front, left, frontleft,
 		frontright) - to use the opposite just use a negative value.
-		Valid values for adjustment: -100% to +100%.
+		Valid values for adjustment: -100 to +100 (100 is maximum tilt).
 		I.e. you want to change tilt to rear you have to send: side=front
 		and a negative adjustment value """
 		# 100% tilt => one side is on full speed - other side is on zero speed

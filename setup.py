@@ -13,15 +13,14 @@ setup(
     version="0.0.1",
     author="Niclas Grande",
     author_email="devlup@outlook.com",
-    description="Python package to control a RaspberryPi based quadcopter. "
-    "Also ships with a web interface.",
+    description="Python package to control a RaspberryPi based quadcopter. ",
     license=load_file_content("LICENSE"),
     keywords="raspberrypi quadcopter multirotor",
     url="https://github.com/ngrande/PiPyFly",
-    packages=["autopylot", "webpylot", "tests"],
+    packages=["autopylot", "tests"],
     long_description=load_file_content("README.md"),
-    install_requires=['pigpio', 'psutil', 'mpu6050-raspberrypi', 'cherrypy'],
-    tests_require=['pigpio', 'psutil', 'mpu6050-raspberrypi'],
+    install_requires=['pigpio', 'psutil', 'mpu6050-raspberrypi', 'smbus-cffi'],
+    tests_require=['pigpio', 'psutil', 'mpu6050-raspberrypi', 'smbus-cffi'],
     test_suite='tests',
     # classifiers = [""]
 )

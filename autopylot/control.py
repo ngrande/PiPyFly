@@ -17,7 +17,6 @@ import psutil
 import pigpio
 
 # my modules
-import autopylot.sensor
 import autopylot.config
 
 ###############################################################################
@@ -32,17 +31,6 @@ import autopylot.config
 # Always expect components to fail
 # Expect the unexpected
 # Priority Nr. 1: Be responsive and stay alive
-###############################################################################
-
-###############################################################################
-# LIST OF TODOs
-###############################################################################
-# TODO implement controls (like changing tilt, or yaw)
-# TODO add a worst case scenario handling for example if the gyro sensor
-# fails in mid fly... or one / several motors stop responding.
-# TODO: Write a wrapper for the gyro sensor so it is easier to change it later
-#  to another module or sensor...
-#
 ###############################################################################
 
 # *****************
@@ -299,6 +287,7 @@ class Quadcopter():
 		front_right = 4
 
 	class MotorSide(enum.Enum):
+		""" Enum to indicate the motor """
 		front_right = 1
 		rear_right = 2
 		rear_left = 3
@@ -307,6 +296,7 @@ class Quadcopter():
 	def __init__(self):
 		pigpiod_running = self._is_daemon_running()
 		if not pigpiod_running:
+			# self._start_pigpio_daeomon()
 			raise Exception("pigpiod daemon did not start properly. "
 							"Check permissions and / or if installed properly")
 		self.pi = pigpio.pi()
@@ -316,8 +306,6 @@ class Quadcopter():
 			raise Exception("Unable to connect to the GPIO pins. Is the daemon running?")
 
 		self.turned_on = False
-		# TODO: gyro sensor is not used here atm
-		self._gyro_sensor = self._init_gyrosensor()
 		self.min_throttle = autopylot.config.get_min_throttle()
 		self.max_throttle = autopylot.config.get_max_throttle()
 		# not sure about this value? Why 1000? Is this not motor specific?
@@ -336,12 +324,6 @@ class Quadcopter():
 		self._motor_rear_right = self._init_motor(
 			autopylot.config.get_motor_rear_right_pin(),
 			autopylot.config.get_motor_rear_right_rotation_is_cw())
-
-	def _init_gyrosensor(self):
-		""" Returns an initialized Gyrosensor object """
-		address = autopylot.config.get_gyrosensor_address()
-		return autopylot.sensor.Gyrosensor(autopylot
-										.config.get_gyrosensor_address())
 
 	def _init_motor(self, pin, cw_rotation):
 		""" Returns an initialized Motor object """
@@ -415,7 +397,6 @@ class Quadcopter():
 
 	def turn_off(self):
 		""" Sends stop signal to each motor and stops the pigpio.pi object """
-		# TODO: add logic to bring the quadcopter safely home / down?
 		overall_success = True
 		try:
 			for motor in self._for_each_motor():
@@ -492,12 +473,6 @@ class Quadcopter():
 	def hover(self):
 		""" Reads the current throttle of each motor and sets them to an equal
 		level so the quadcopter should hover """
-		# TODO: include sensor data in the processing here... (outline it
-		# into another function / task)
-
-		# NOTE: this is first very primitive because we will only set the
-		# throttle to a equal level so it should hover (but only in an
-		# environment without wind and stuff like that...)
 		overall_success = True
 		try:
 			total_throttle = self.request_total_throttle()

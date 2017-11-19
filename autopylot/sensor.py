@@ -30,12 +30,14 @@ class Gyrosensor():
 		return rounded_temp
 
 	def get_acceleration_data(self):
-		""" Returns the acceleration data measured by the gyrosensor """
+		""" Returns the acceleration data measured by the gyrosensor.
+		['x', 'y', 'z']"""
 		accel_data = self.sensor.get_accel_data()
 		return accel_data
 
 	def get_gyroscope_data(self):
-		""" Returns the gyroscope data from the gyrosensor """
+		""" Returns the gyroscope data from the gyrosensor.
+		['x','y','z']"""
 		gyro_data = self.sensor.get_gyro_data()
 		return gyro_data
 

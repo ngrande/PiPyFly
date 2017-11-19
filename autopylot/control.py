@@ -142,7 +142,7 @@ class Motor():
 		#
 		# set watchdog to 10ms (because we need full control over the motor)
 		# #####################################################################
-		wd_timeout_ms = 10
+		wd_timeout_ms = 100
 		self.pi.set_watchdog(self.pin, wd_timeout_ms)
 		logging.info("Activated a watchdog (timeout: {!s}ms) and callback for "
 					"pin: {!s}".format(wd_timeout_ms, self.pin))
@@ -502,7 +502,7 @@ class Quadcopter():
 		try:
 			total_throttle = self.request_total_throttle()
 
-			throttle_foreach = total_throttle / 4
+			throttle_foreach = int(total_throttle / 4)
 			for motor in self._for_each_motor():
 				success = motor.send_throttle(throttle_foreach)
 				if not success:
@@ -540,8 +540,8 @@ class Quadcopter():
 		overall_success = True
 		try:
 			total_throttle = self.request_total_throttle()
-			base_throttle = total_throttle / 4
-			factor = base_throttle / 100 * absolute_yaw
+			base_throttle = int(total_throttle / 4)
+			factor = int(base_throttle / 100 * absolute_yaw)
 			
 			for motor in self._for_each_motor():
 				new_throttle = None
@@ -573,8 +573,8 @@ class Quadcopter():
 		overall_success = True
 		try:
 			total_throttle = self.request_total_throttle()
-			base_throttle = total_throttle / 4
-			factor = base_throttle / 100 * adjustment
+			base_throttle = int(total_throttle / 4)
+			factor = int(base_throttle / 100 * adjustment)
 
 			if side is self.TiltSide.front:
 				overall_success = self._motor_front_right.send_throttle(base_throttle - factor)

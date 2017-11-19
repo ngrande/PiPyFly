@@ -3,6 +3,9 @@ import autopylot.control
 
 
 quadcopter = autopylot.control.Quadcopter()
+YAW_STEP = 5
+TILT_STEP = 5
+THROTTLE_STEP = 1
 
 def handle_user_input(key):
 	""" handles the user input """
@@ -12,22 +15,24 @@ def handle_user_input(key):
 		quadcopter.turn_on()
 	elif key == 'O':  # only with SHIFT
 		quadcopter.turn_off()
-	elif key == 'w':
-		quadcopter.change_tilt(quadcopter.TiltSide.front, 10)
-	elif key == 's':
-		quadcopter.change_tilt(quadcopter.TiltSide.front, -10)
-	elif key == 'a':
-		quadcopter.change_tilt(quadcopter.TiltSide.left, 10)
-	elif key == 'd':
-		quadcopter.change_tilt(quadcopter.TiltSide.left, -10)
+	elif key == ' ':
+		quadcopter.hover()
+	elif key in ['up', 'w']:
+		quadcopter.change_tilt(quadcopter.TiltSide.front, TILT_STEP)
+	elif key in ['down', 's']:
+		quadcopter.change_tilt(quadcopter.TiltSide.front, -TILT_STEP)
+	elif key in ['left', 'a']:
+		quadcopter.change_tilt(quadcopter.TiltSide.left, TILT_STEP)
+	elif key in ['right', 'd']:
+		quadcopter.change_tilt(quadcopter.TiltSide.left, -TILT_STEP)
 	elif key == 'q':
-		quadcopter.change_yaw(-10)
+		quadcopter.change_yaw(-YAW_STEP)
 	elif key == 'e':
-		quadcopter.change_yaw(10)
+		quadcopter.change_yaw(YAW_STEP)
 	elif key == '+':
-		quadcopter.change_overall_throttle(quadcopter.request_total_throttle() / 4 + 10) # increase throttle by 10 for each motor
+		quadcopter.change_overall_throttle(quadcopter.request_total_throttle() / 4 + THROTTLE_STEP)
 	elif key =='-':
-		quadcopter.change_overall_throttle(quadcopter.request_total_throttle() / 4 - 10)
+		quadcopter.change_overall_throttle(quadcopter.request_total_throttle() / 4 - THROTTLE_STEP)
 
 	# update status fields
 	update_states()
@@ -36,14 +41,14 @@ def handle_user_input(key):
 def update_states():
 	""" updates the throttle display """
 	if not quadcopter.turned_on:
-		drone_state.set_text(('throttle', u"OFF"))
+		drone_state.set_text(('off', u"OFF"))
 		motor_fl_throttle.set_text(('throttle', u"NA"))
 		motor_fr_throttle.set_text(('throttle', u"NA"))
 		motor_rl_throttle.set_text(('throttle', u"NA"))
 		motor_rr_throttle.set_text(('throttle', u"NA"))
 		total_throttle.set_text(('throttle', u"NA"))
 	else:
-		drone_state.set_text(('throttle', u"ON"))
+		drone_state.set_text(('on', u"ON"))
 		motor_fl_throttle.set_text(('throttle', u"{!s}".format(quadcopter.request_throttle(quadcopter.MotorSide.front_left))))
 		motor_fr_throttle.set_text(('throttle', u"{!s}".format(quadcopter.request_throttle(quadcopter.MotorSide.front_right))))
 		motor_rl_throttle.set_text(('throttle', u"{!s}".format(quadcopter.request_throttle(quadcopter.MotorSide.rear_left))))
@@ -57,6 +62,8 @@ palette = [
 		('throttle', 'black', 'yellow'),
 		('background', 'white', 'black'),
 		('input', 'black', 'white'),
+		('on', '', '', '', 'black', '#0d0'),
+		('off', '', '', '', 'white', '#d00'),
 ]
 
 motor_fl_throttle = urwid.Text(('throttle', u"FL"), align='center')
@@ -67,7 +74,7 @@ total_throttle = urwid.Text(('throttle', u"NA"), align='center')
 user_input = urwid.Text(('input', u""), align='center')
 drone_state = urwid.Text(('throttle', u"OFF"), align='center')
 name = urwid.Text(u"Easy Access", align='center')
-legend = urwid.Text(('legend', U"I: ignite | O: off | w: front | a: left | s: rear | d: right | q: ccw | e: cw | +: up | -: down"), align='center')
+legend = urwid.Text(('legend', U"I: ignite | O: off | SPACE: hover | w: front | a: left | s: rear | d: right | q: ccw | e: cw | +: up | -: down"), align='center')
 
 placeholder = urwid.SolidFill()
 
@@ -91,7 +98,11 @@ for motor in [motor_rl_throttle, motor_rr_throttle]:
 for item in [name, div, legend, div, user_input, drone_state, 
 			div, motor_grid_top, total_throttle, motor_grid_bottom]:
 	pile.contents.append((item, pile.options()))
-loop.run()
+
+try:
+	loop.run()
+finally:
+	quadcopter.turn_off()
 
 
 

@@ -272,6 +272,32 @@ class TestControlQuadcopter(unittest.TestCase):
 			side=self.quadcopter.TiltSide.front_right,
 			adjustment=-200))
 
+	def test_change_tilt_left(self):
+		""" tests changing the tilt to left """
+		self.assertTrue(self.quadcopter.turn_on())
+		self.assertTrue(self.quadcopter.change_overall_throttle(50))
+
+		self.assertTrue(self.quadcopter.change_tilt(
+			side=self.quadcopter.TiltSide.left,
+			adjustment=20))
+		self.assertIs(self.quadcopter._motor_front_left.current_throttle, 40)
+		self.assertIs(self.quadcopter._motor_front_right.current_throttle, 60)
+		self.assertIs(self.quadcopter._motor_rear_right.current_throttle, 60)
+		self.assertIs(self.quadcopter._motor_rear_left.current_throttle, 40)
+
+	def test_change_tilt_right(self):
+		""" tests changing the tilt to right """
+		self.assertTrue(self.quadcopter.turn_on())
+		self.assertTrue(self.quadcopter.change_overall_throttle(50))
+
+		self.assertTrue(self.quadcopter.change_tilt(
+			side=self.quadcopter.TiltSide.left,
+			adjustment=-20))
+		self.assertIs(self.quadcopter._motor_front_left.current_throttle, 60)
+		self.assertIs(self.quadcopter._motor_front_right.current_throttle, 40)
+		self.assertIs(self.quadcopter._motor_rear_right.current_throttle, 40)
+		self.assertIs(self.quadcopter._motor_rear_left.current_throttle, 60)
+
 	def test_hover(self):
 		""" Tests hover """
 		self.assertTrue(self.quadcopter.turn_on())

@@ -593,6 +593,12 @@ class Quadcopter():
 				overall_success = self._motor_front_left.send_throttle(base_throttle)
 				overall_success = self._motor_rear_right.send_throttle(base_throttle)
 				overall_success = self._motor_rear_left.send_throttle(base_throttle + factor)
+			elif side is self.TiltSide.left:
+				overall_success = self._motor_front_right.send_throttle(base_throttle + factor)
+				overall_success = self._motor_front_left.send_throttle(base_throttle - factor)
+				overall_success = self._motor_rear_right.send_throttle(base_throttle + factor)
+				overall_success = self._motor_rear_left.send_throttle(base_throttle - factor)
+	
 
 			if overall_success:
 				assert total_throttle == self.request_total_throttle(), "Total throttle should always stay consistent"

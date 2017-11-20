@@ -6,11 +6,11 @@ import time
 import mpu6050.mpu6050 as mpu6050
 
 
-class Gyrosensor():
-	""" Wrapper class for the mpu6050 gyrosensor.
+class SensorData():
+	""" Wrapper class for all the used sensors - like the mpu6050 gyrosensor.
 	Makes it easier to switch the module which communicates with the
 	mpu6050 sensor easier later. Or we could even switch to a whole
-	new sensor """
+	new sensor and also add new sensors """
 	def __init__(self, address):
 		self.sensor = mpu6050(address)
 		# configure the gyro sensor
@@ -40,6 +40,11 @@ class Gyrosensor():
 		['x','y','z']"""
 		gyro_data = self.sensor.get_gyro_data()
 		return gyro_data
+
+	def get_magneto_data(self):
+		""" Returns the x,y,z axis magnet field data """
+		# TODO: implement when i have a sensor for it
+		return None
 
 	def _perform_selfcheck(self):
 		""" Checks if the gyrosensor is active and responding with

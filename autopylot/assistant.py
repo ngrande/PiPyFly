@@ -7,17 +7,19 @@ import autopylot.config
 
 class Assistant():
 	def __init__(self):
-		self._gyro_sensor = self._init_gyrosensor()
+		self._sensor_data = self._init_sensor()
 
-	def _init_gyrosensor(self):
+	def _init_sensor(self):
 		""" Returns an initialized Gyrosensor object """
 		address = autopylot.config.get_gyrosensor_address()
-		return autopylot.sensor.Gyrosensor(address)
+		return autopylot.sensor.SensorData(address)
 
 	def keep_hovering(self):
 		""" tries to hold the drone as steady as possible 
 		in the same position """
-		gyro_data = self._gyro_sensor.get_gyroscope_data()
-		accel_data = self._gyro_sensor.get_acceleration_data()
+		gyro_data = self._sensor_data.get_gyroscope_data()
+		accel_data = self._sensor_data.get_acceleration_data()
+
+		# TODO: see my gyrosensor.md document for more info how i plan to use this figures
 
 # vim: tabstop=4 shiftwidth=4 noexpandtab

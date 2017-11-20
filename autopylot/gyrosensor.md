@@ -11,3 +11,13 @@ This means we simply have to track each motion and calculate the current positio
 
 ### Using Acceleration Data
 The acceleration data (in G) will tell us how fast the motion was performed - the faster the motion the stronger we have to react -> the motors of the drone have to throttle higher than with a slow motion (low G).
+
+### Formula
+#### Distance
+
+    velocity = sum(acceleration)
+    distance = sum(velocity)
+
+#### Angular change
+
+    tilt = sum(rotation)

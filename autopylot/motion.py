@@ -82,13 +82,26 @@ class MotionTracker():
 			y_values.append(sample['y'])
 			z_values.append(sample['z'])
 
-		min_dict['x'] = min(x_values)
-		min_dict['y'] = min(y_values)
-		min_dict['z'] = min(z_values)
+		def add_blur(value):
+			if value < 0:
+				return value - (value * 0.2)
+			else:
+				return value + (value * 0.2)
 
-		max_dict['x'] = max(x_values)
-		max_dict['y'] = max(y_values)
-		max_dict['z'] = max(z_values)
+		def sub_blur(value):
+			if value < 0:
+				return value + (value * 0.2)
+			else:
+				return value - (value * 0.2)
+			
+
+		min_dict['x'] = sub_blur(min(x_values))
+		min_dict['y'] = sub_blur(min(y_values))
+		min_dict['z'] = sub_blur(min(z_values))
+
+		max_dict['x'] = add_blur(max(x_values))
+		max_dict['y'] = add_blur(max(y_values))
+		max_dict['z'] = add_blur(max(z_values))
 
 		return dead_zone
 
@@ -168,7 +181,6 @@ class MotionTracker():
 		# I THINK I KNOW HOW TO SOLVE MY PROBLEM
 		# WE NEED TO CLEAR THE BUFFER OF THE MPU6050
 		# AFTER EACH READ
-			time.sleep(0.1)
 
 
 

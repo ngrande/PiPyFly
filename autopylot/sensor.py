@@ -1,4 +1,6 @@
 """ Wrapper for all sensors (reading) """
+# TODO: make this class global (singleton) because we can only
+# utilize the sensors once for the whole system
 
 import logging
 import time

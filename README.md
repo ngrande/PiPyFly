@@ -5,6 +5,9 @@ Create a Multicopter using a RaspberryPi
 ![quadcopter top view](doc/pics/IMG_20170121_224149.jpg "Quadcopter top view")
 
 ## Setup
+You need to have the ``` python-smbus ``` package installed
+
+
 install the python package via ``` make install ```
 __make sure to start the pigpiod daemon__ to be able to control the pins
 which is included in the pigpio python module

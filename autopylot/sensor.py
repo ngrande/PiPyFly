@@ -18,8 +18,10 @@ class SensorData():
 		# configure the gyro sensor
 		# let it here be hardcoded because maybe we'll change the sensor
 		# in the future and then we won't be able to use the same configs
-		self.sensor.set_gyro_range(mpu6050.GYRO_RANGE_250DEG)
-		self.sensor.set_accel_range(mpu6050.ACCEL_RANGE_2G)
+		# self.sensor.set_gyro_range(mpu6050.GYRO_RANGE_250DEG)
+		self.sensor.set_gyro_range(mpu6050.GYRO_RANGE_2000DEG)
+		# self.sensor.set_accel_range(mpu6050.ACCEL_RANGE_2G)
+		self.sensor.set_accel_range(mpu6050.ACCEL_RANGE_8G)
 		# TODO: sensor data is shitty... the check always fails
 		# assert self._perform_selfcheck(), "Sensor self check failed"
 

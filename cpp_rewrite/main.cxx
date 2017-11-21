@@ -1,7 +1,8 @@
 #include <string>
 #include <iostream>
 #include "wiringPi/wiringPi/wiringPi.h"
-#include "wiringPi/wiringPi/softServo.h"
+#include "motor.h"
+#include "config.h"
 
 #define FL_MOTOR 4
 #define MAX_PWM 1860
@@ -9,18 +10,12 @@
 int main()
 {
 	std::cout << "Quadcopter Powering up" << std::endl;
-
-	// before we continue - lets check if we can use the software pwm
-	// as in the python version.
-
+	
+	pi_drone::config::initialize();
 	std::cout << "Setup GPIO" << std::endl;
 	wiringPiSetupGpio();
 
-	if (softServoSetup(FL_MOTOR, -1, -1, -1, -1, -1, -1, -1))
-	{
-		std::cout << "error initialising pwm pin" << std::endl;
-	}
-	softServoWrite(FL_MOTOR, 100);
+	pi_drone::init_motors(100, { FL_MOTOR });
 
 	while (true)
 	{

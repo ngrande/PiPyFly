@@ -7,16 +7,13 @@
 #include <vector>
 
 #include "wiringPi/wiringPi/softServo.h"
-#include "config.h"
 
-#define FL_MOTOR 4
-#define MAX_PWM 1860
 namespace pi_drone
 {
 
 const int8_t NO_PIN = -1;
 
-bool init_motors(uint16_t start_seq, std::vector<int8_t> pins)
+bool init_motors(uint16_t start_signal, std::vector<int8_t> pins)
 {
 	int8_t tmp_pins[8];
 	for (size_t i = 0; i < sizeof(tmp_pins); ++i)
@@ -39,7 +36,7 @@ bool init_motors(uint16_t start_seq, std::vector<int8_t> pins)
 
 	for (const auto pin : pins)
 	{
-		softServoWrite(pin, start_seq);
+		softServoWrite(pin, start_signal);
 	}
 
 	return true;
@@ -49,8 +46,9 @@ class Motor
 {
 private:
 	uint8_t pin;
-	bool cw_rotation;
-	uint16_t start_seq;
+	bool cw_rotation; ///< clockwise rotation - otherwise CCW
+	uint16_t start_signal;
+	uint16_t stop_signal;
 	uint8_t curr_throttle; ///< curr throttle on the map (0-100)
 	bool started;
 	std::unordered_map<uint8_t, uint16_t> throttle_map;
@@ -85,22 +83,24 @@ private:
 	}
 
 public:
-	Motor(uint8_t _pin, bool _cw_rotation, uint16_t _start_seq, 
-			uint16_t _min_throttle, uint16_t _max_throttle)
-		: pin(_pin), cw_rotation(_cw_rotation), start_seq(_start_seq),
-		curr_throttle(0), started(false)
+	Motor(uint8_t _pin, bool _cw_rotation, uint16_t _start_signal,
+			uint16_t _stop_signal, uint16_t _min_throttle,
+			uint16_t _max_throttle)
+		: pin(_pin), cw_rotation(_cw_rotation), start_signal(_start_signal),
+		stop_signal(_stop_signal), curr_throttle(0), started(false), 
+		throttle_map({})
 	{
 		init_throttle_map(_min_throttle, _max_throttle);
 	}
 
-	bool start()
+	bool send_start()
 	{
 		if (started)
 		{
 			return false;
 		}
 
-		softServoWrite(pin, config::s_start_signal);
+		softServoWrite(pin, start_signal);
 
 		started = true;
 		curr_throttle = 0;
@@ -110,14 +110,14 @@ public:
 		return true;
 	}
 	
-	bool stop()
+	bool send_stop()
 	{
 		if (!started)
 		{
 			return false;
 		}
 
-		softServoWrite(pin, config::s_stop_signal);
+		softServoWrite(pin, stop_signal);
 		curr_throttle = 0;
 		
 		// __LOGGING__
@@ -149,6 +149,11 @@ public:
 		// and the curr_throttle value is set by us correctly
 		assert(it != throttle_map.end());
 		return it->second;
+	}
+
+	bool is_cw()
+	{
+		return cw_rotation;
 	}
 };
 

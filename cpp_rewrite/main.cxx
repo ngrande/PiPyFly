@@ -4,7 +4,7 @@
 #include "motor.h"
 #include "config.h"
 
-#define FL_MOTOR 4
+#define FL_MOTOR 4 
 #define MAX_PWM 1860
 
 int main()

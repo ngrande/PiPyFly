@@ -56,10 +56,10 @@ private:
 	}
 
 public:
-	Motor(uint8_t pin, uint16_t start_seq, uint16_t min_throttle, 
-			uint16_t max_throttle)
-		: pin(pin), start_seq(start_seq), min_throttle(min_throttle),
-			max_throttle(max_throttle)
+	Motor(uint8_t _pin, uint16_t _start_seq, uint16_t _min_throttle, 
+			uint16_t _max_throttle)
+		: pin(_pin), start_seq(_start_seq), min_throttle(_min_throttle),
+			max_throttle(_max_throttle), curr_throttle(0)
 	{
 		
 	}

@@ -2,8 +2,12 @@
 #define __MOTOR_PI_DRONE_H
 
 #include <string>
+#include <unordered_map>
+#include <cassert>
 #include <vector>
+
 #include "wiringPi/wiringPi/softServo.h"
+#include "config.h"
 
 #define FL_MOTOR 4
 #define MAX_PWM 1860
@@ -45,38 +49,106 @@ class Motor
 {
 private:
 	uint8_t pin;
+	bool cw_rotation;
 	uint16_t start_seq;
-	uint16_t min_throttle;
-	uint16_t max_throttle;
-	uint16_t curr_throttle;
+	uint8_t curr_throttle; ///< curr throttle on the map (0-100)
+	bool started;
+	std::unordered_map<uint8_t, uint16_t> throttle_map;
 
-	bool check_throttle_value(uint16_t value)
+	void init_throttle_map(uint16_t min, uint16_t max)
 	{
-		return value <= this->max_throttle && value >= this->min_throttle;
-	}
-
-public:
-	Motor(uint8_t _pin, uint16_t _start_seq, uint16_t _min_throttle, 
-			uint16_t _max_throttle)
-		: pin(_pin), start_seq(_start_seq), min_throttle(_min_throttle),
-			max_throttle(_max_throttle), curr_throttle(0)
-	{
-		
-	}
-
-	bool send_throttle(uint16_t value)
-	{
-		if (!check_throttle_value(value))
+		uint16_t step = (max - min) / 99;
+		uint16_t one_perc = min - step; // so at 1% we will have min throttle
+		for (size_t i = 0; i < 101; ++i)
 		{
+			throttle_map.insert({i, one_perc + (step * i)});
+		}
+
+		assert(throttle_map.size() == 100);
+	}
+
+	bool translate_value_to_throttle(uint8_t value, uint16_t& throttle_out)
+	{
+		if (value > 100 /* || value < 0 - we dont need this check
+		because it is an unsigned int */)
+		{
+			// __LOGGING__
 			return false;
 		}
-		softServoWrite(this->pin, value);
+		
+		auto it = throttle_map.find(value);
+		// it should always find a value inbetween 0 - 100
+		// otherwise the code is broken
+		assert(it != throttle_map.end());
+		throttle_out = it->second;
 		return true;
 	}
 
-	uint16_t get_curr_throttle()
+public:
+	Motor(uint8_t _pin, bool _cw_rotation, uint16_t _start_seq, 
+			uint16_t _min_throttle, uint16_t _max_throttle)
+		: pin(_pin), cw_rotation(_cw_rotation), start_seq(_start_seq),
+		curr_throttle(0), started(false)
+	{
+		init_throttle_map(_min_throttle, _max_throttle);
+	}
+
+	bool start()
+	{
+		if (started)
+		{
+			return false;
+		}
+
+		softServoWrite(pin, config::s_start_signal);
+
+		started = true;
+		curr_throttle = 0;
+
+		// __LOGGING__
+
+		return true;
+	}
+	
+	bool stop()
+	{
+		if (!started)
+		{
+			return false;
+		}
+
+		softServoWrite(pin, config::s_stop_signal);
+		curr_throttle = 0;
+		
+		// __LOGGING__
+
+		return true;
+	}
+
+	bool send_throttle(uint8_t value)
+	{
+		uint16_t throttle;
+		if (!translate_value_to_throttle(value, throttle))
+		{
+			return false;
+		}
+		softServoWrite(this->pin, throttle);
+		return true;
+	}
+
+	uint8_t get_curr_throttle()
 	{
 		return this->curr_throttle;
+	}
+
+	uint16_t get_curr_throttle_real()
+	{
+		auto it = throttle_map.find(curr_throttle);
+		// we expect this to be in range
+		// because the map is filled already
+		// and the curr_throttle value is set by us correctly
+		assert(it != throttle_map.end());
+		return it->second;
 	}
 };
 

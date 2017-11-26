@@ -19,9 +19,6 @@ namespace pi_drone
 class quadcopter
 {
 private:
-	float yaw_offset = 0;
-	int calibration_count = 0;
-	bool calibrating_sensor = true;
 	motion_sensor sensor;
 	bool turned_on;
 	Motor motor_fl;
@@ -36,31 +33,9 @@ private:
 
 	void process_sensor_data(const float yaw, const float pitch, const float roll)
 	{
-		if (calibrating_sensor)
-		{
-			float rounded_pitch = std::abs(std::round(pitch));
-			float rounded_roll = std::abs(std::round(roll));
-			std::cout << "PITCH " << rounded_pitch << " ROLL " << rounded_roll << std::endl;
-			// std::round rounds AWAY from zero and never TO zero
-			if (rounded_pitch - 1 == 0 && 
-				rounded_roll - 1 == 0)
-			{
-				calibration_count += 2;
-				if (calibration_count >= 12)
-				{
-					yaw_offset = yaw;
-					calibrating_sensor = false;
-				}
-			}
-			else
-			{
-				calibration_count -= 1;
-			}
-			return;
-		}
-		std::cout << "YAW: " << yaw << std::endl;
-		std::cout << "ROLL: " << pitch << std::endl;
-		std::cout << "PITCH: " << roll << std::endl;
+		//std::cout << "YAW: " << yaw << std::endl;
+		//std::cout << "ROLL: " << pitch << std::endl;
+		//std::cout << "PITCH: " << roll << std::endl;
 	}
 
 public:
@@ -94,12 +69,14 @@ public:
 		assert(motor_fl.is_cw() != motor_rl.is_cw());
 
 		sensor.subscribe([&](const float yaw, const float pitch, const float roll) {
-				process_sensor_data(yaw - yaw_offset, pitch, roll);
+				process_sensor_data(yaw, pitch, roll);
 		});
 	}
 
 	bool turn_on()
 	{
+		assert(turned_on == false);
+
 		sensor.start();
 		bool success = false;
 		for (auto& pair : motors)
@@ -117,6 +94,8 @@ public:
 
 	bool turn_off()
 	{
+		assert(turned_on);
+
 		sensor.stop();
 		bool success = false;
 		for (auto& pair : motors)
@@ -134,6 +113,8 @@ public:
 
 	bool set_overall_throttle(uint8_t value)
 	{
+		assert(turned_on);
+
 		// TODO: this is shit - because we have to set each motor separately
 		// otherwise it will go in hover and go up or down and not stay
 		// in the current pitch / yaw
@@ -149,6 +130,7 @@ public:
 			// this is simply used to balance unequally strong motors
 			// offset should be calculated with the sensor data
 			success = motor.send_throttle(value + (value / 100 * offset));
+			//motor.send_real(value);
 
 			if (!success)
 			{

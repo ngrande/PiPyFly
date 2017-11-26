@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <cassert>
 #include <vector>
+#include <iostream>
 
 #include "wiringPi/wiringPi/softServo.h"
 
@@ -13,7 +14,7 @@ namespace pi_drone
 
 const int8_t NO_PIN = -1;
 
-bool init_motors(uint16_t start_signal, std::vector<int8_t> pins)
+bool init_motors(std::vector<int8_t> pins)
 {
 	int8_t tmp_pins[8];
 	for (size_t i = 0; i < sizeof(tmp_pins); ++i)
@@ -36,7 +37,10 @@ bool init_motors(uint16_t start_signal, std::vector<int8_t> pins)
 
 	for (const auto pin : pins)
 	{
-		softServoWrite(pin, start_signal);
+		// signalize the ESCs to get ready for takeoff!
+		softServoWrite(pin, 0);
+		// do not know but do it twice...
+		softServoWrite(pin, 0);
 	}
 
 	return true;
@@ -55,13 +59,17 @@ private:
 
 	void init_throttle_map(uint16_t min, uint16_t max)
 	{
-		uint16_t step = (max - min) / 99;
-		uint16_t one_perc = min - step; // so at 1% we will have min throttle
-		for (size_t i = 0; i < 101; ++i)
+		float step = (max - min) / 99.0;
+		assert(step > 0);
+		throttle_map.insert({0, 0});
+		for (size_t i = 0; i < 100; ++i)
 		{
-			throttle_map.insert({i, one_perc + (step * i)});
+			auto val = min + uint16_t(step * i + 0.5);
+			throttle_map.insert({i + 1, val});
+			std::cout << i + 1 << ": " << val << std::endl;
 		}
 
+		// start at 0 and end with 100
 		assert(throttle_map.size() == 101);
 	}
 
@@ -100,7 +108,7 @@ public:
 			return false;
 		}
 
-		softServoWrite(pin, start_signal);
+		//softServoWrite(pin, start_signal);
 
 		started = true;
 		curr_throttle = 0;
@@ -117,7 +125,7 @@ public:
 			return false;
 		}
 
-		softServoWrite(pin, stop_signal);
+		//softServoWrite(pin, stop_signal);
 		curr_throttle = 0;
 		
 		// __LOGGING__
@@ -135,6 +143,11 @@ public:
 		softServoWrite(this->pin, throttle);
 		return true;
 	}
+
+	//void send_real(uint16_t val)
+	//{
+		//softServoWrite(this->pin, val);
+	//}
 
 	uint8_t get_curr_throttle()
 	{

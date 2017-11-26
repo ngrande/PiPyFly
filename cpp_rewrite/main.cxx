@@ -16,7 +16,7 @@ int main()
 	std::cout << "Setup GPIO" << std::endl;
 	wiringPiSetupGpio();
 
-	pi_drone::init_motors(100, {
+	pi_drone::init_motors({
 			pi_drone::config::s_motor_fl_pin,
 			pi_drone::config::s_motor_fr_pin,
 			pi_drone::config::s_motor_rr_pin,

@@ -62,7 +62,7 @@ private:
 			throttle_map.insert({i, one_perc + (step * i)});
 		}
 
-		assert(throttle_map.size() == 100);
+		assert(throttle_map.size() == 101);
 	}
 
 	bool translate_value_to_throttle(uint8_t value, uint16_t& throttle_out)

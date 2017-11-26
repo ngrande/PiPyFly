@@ -7,6 +7,7 @@
 #include <vector>
 #include <cassert>
 #include <utility>
+#include <cmath>
 
 #include "config.h"
 #include "motor.h"
@@ -18,6 +19,9 @@ namespace pi_drone
 class quadcopter
 {
 private:
+	float yaw_offset = 0;
+	int calibration_count = 0;
+	bool calibrating_sensor = true;
 	motion_sensor sensor;
 	bool turned_on;
 	Motor motor_fl;
@@ -30,6 +34,35 @@ private:
 	uint8_t motor_rr_offset; ///< offset (+-%) to balance motor rr
 	std::vector<std::pair<Motor&, uint8_t&>> motors; ///< references all motors -> used to operate on all motors at once
 
+	void process_sensor_data(const float yaw, const float pitch, const float roll)
+	{
+		if (calibrating_sensor)
+		{
+			float rounded_pitch = std::abs(std::round(pitch));
+			float rounded_roll = std::abs(std::round(roll));
+			std::cout << "PITCH " << rounded_pitch << " ROLL " << rounded_roll << std::endl;
+			// std::round rounds AWAY from zero and never TO zero
+			if (rounded_pitch - 1 == 0 && 
+				rounded_roll - 1 == 0)
+			{
+				calibration_count += 2;
+				if (calibration_count >= 12)
+				{
+					yaw_offset = yaw;
+					calibrating_sensor = false;
+				}
+			}
+			else
+			{
+				calibration_count -= 1;
+			}
+			return;
+		}
+		std::cout << "YAW: " << yaw << std::endl;
+		std::cout << "ROLL: " << pitch << std::endl;
+		std::cout << "PITCH: " << roll << std::endl;
+	}
+
 public:
 	quadcopter()
 		: turned_on(false),
@@ -41,7 +74,7 @@ public:
 				   config::s_start_signal, config::s_stop_signal,
 				   config::s_min_throttle, config::s_max_throttle),
 		  motor_fr_offset(0),
-		  motor_rl(config::s_motor_rl_pin, config::s_motor_fl_cw, 
+		  motor_rl(config::s_motor_rl_pin, config::s_motor_rl_cw, 
 				   config::s_start_signal, config::s_stop_signal,
 				   config::s_min_throttle, config::s_max_throttle),
 		  motor_rl_offset(0),
@@ -60,15 +93,14 @@ public:
 		assert(motor_rl.is_cw() != motor_rr.is_cw());
 		assert(motor_fl.is_cw() != motor_rl.is_cw());
 
-		sensor.subscribe([](const float yaw, const float pitch, const float roll) {
-				std::cout << "YAW: " << yaw << std::endl;
-				std::cout << "ROLL: " << pitch << std::endl;
-				std::cout << "PITCH: " << roll << std::endl;
-				});
+		sensor.subscribe([&](const float yaw, const float pitch, const float roll) {
+				process_sensor_data(yaw - yaw_offset, pitch, roll);
+		});
 	}
 
 	bool turn_on()
 	{
+		sensor.start();
 		bool success = false;
 		for (auto& pair : motors)
 		{
@@ -85,6 +117,7 @@ public:
 
 	bool turn_off()
 	{
+		sensor.stop();
 		bool success = false;
 		for (auto& pair : motors)
 		{

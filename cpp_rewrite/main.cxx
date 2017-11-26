@@ -23,16 +23,19 @@ int main()
 			pi_drone::config::s_motor_rl_pin
 	});
 
+	pi_drone::quadcopter quad;
+	quad.turn_on();
+
 	while (true)
 	{
-		std::cout << "input a value between 180 and 1000" << std::endl;
-		int new_pwm = 0;
+		std::cout << "input a value between 0 and 100" << std::endl;
+		uint8_t new_pwm = 0;
 		std::string input;
 		std::cin >> input;
 		new_pwm = std::stoi(input);
-		std::cout << "updating pwm to " << new_pwm << std::endl;
-
-		softServoWrite(FL_MOTOR, new_pwm);
+		std::cout << "updating throttle to " << new_pwm << std::endl;
+		
+		quad.set_overall_throttle(new_pwm);
 	}
 	return 0;
 }

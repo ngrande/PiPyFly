@@ -1,6 +1,6 @@
 CC=gcc
 CXX=g++
-CXXFLAGS= -Weffc++ -Wstrict-aliasing -Wwrite-strings -Winit-self -Wcast-align -Wpointer-airht -Wmissing-declarations -Wmissing-include-dirs -Wno-unused-parameter -Wuninitialized -Wshadow -Wall -Wextra
+CXXFLAGS= -g -Weffc++ -Wstrict-aliasing -Wwrite-strings -Winit-self -Wcast-align -Wpointer-arith -Wmissing-declarations -Wmissing-include-dirs -Wno-unused-parameter -Wuninitialized -Wshadow -Wall -Wextra
 
 PROG=FlyControl
 
@@ -8,7 +8,7 @@ PROG=FlyControl
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 all: $(PROG).o
-	$(CXX) wiringPi/wiringPi/softServo.c \
+	$(CXX) $(CXXFLAGS) wiringPi/wiringPi/softServo.c \
 		main.cxx \
 		MotionSensor/libMotionSensor.a \
 		libs/libI2Cdev.a \

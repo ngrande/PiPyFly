@@ -3,6 +3,7 @@
 #include "wiringPi/wiringPi/wiringPi.h"
 #include "motor.h"
 #include "config.h"
+#include "drone.h"
 
 #define FL_MOTOR 4 
 #define MAX_PWM 1860
@@ -15,7 +16,12 @@ int main()
 	std::cout << "Setup GPIO" << std::endl;
 	wiringPiSetupGpio();
 
-	pi_drone::init_motors(100, { FL_MOTOR });
+	pi_drone::init_motors(100, {
+			pi_drone::config::s_motor_fl_pin,
+			pi_drone::config::s_motor_fr_pin,
+			pi_drone::config::s_motor_rr_pin,
+			pi_drone::config::s_motor_rl_pin
+	});
 
 	while (true)
 	{

@@ -1,6 +1,7 @@
 #ifndef __DRONE_PI_DRONE_H
 #define __DRONE_PI_DRONE_H
 
+#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -9,13 +10,15 @@
 
 #include "config.h"
 #include "motor.h"
+#include "sensor.h"
 
 namespace pi_drone
 {
 
-class Quadcopter
+class quadcopter
 {
 private:
+	motion_sensor sensor;
 	bool turned_on;
 	Motor motor_fl;
 	uint8_t motor_fl_offset; ///< offset (+-%) to balance motor fl
@@ -28,7 +31,7 @@ private:
 	std::vector<std::pair<Motor&, uint8_t&>> motors; ///< references all motors -> used to operate on all motors at once
 
 public:
-	Quadcopter()
+	quadcopter()
 		: turned_on(false),
 		  motor_fl(config::s_motor_fl_pin, config::s_motor_fl_cw, 
 				   config::s_start_signal, config::s_stop_signal,
@@ -56,6 +59,12 @@ public:
 		assert(motor_fl.is_cw() != motor_fr.is_cw());
 		assert(motor_rl.is_cw() != motor_rr.is_cw());
 		assert(motor_fl.is_cw() != motor_rl.is_cw());
+
+		sensor.subscribe([](const float yaw, const float pitch, const float roll) {
+				std::cout << "YAW: " << yaw << std::endl;
+				std::cout << "ROLL: " << pitch << std::endl;
+				std::cout << "PITCH: " << roll << std::endl;
+				});
 	}
 
 	bool turn_on()

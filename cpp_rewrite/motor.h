@@ -39,7 +39,7 @@ bool init_motors(std::vector<int8_t> pins)
 	{
 		// signalize the ESCs to get ready for takeoff!
 		softServoWrite(pin, 0);
-		// do not know but do it twice...
+		// do not know why but i have to do it twice...
 		softServoWrite(pin, 0);
 	}
 
@@ -77,6 +77,11 @@ private:
 	{
 		if (value > 100 /* || value < 0 - we dont need this check
 		because it is an unsigned int */)
+		{
+			// __LOGGING__
+			return false;
+		}
+		else if (value < 0) // clearly not possible with unsigned - but maybe we change it later
 		{
 			// __LOGGING__
 			return false;
@@ -125,7 +130,7 @@ public:
 			return false;
 		}
 
-		//softServoWrite(pin, stop_signal);
+		softServoWrite(pin, stop_signal);
 		curr_throttle = 0;
 		
 		// __LOGGING__
@@ -141,6 +146,7 @@ public:
 			return false;
 		}
 		softServoWrite(this->pin, throttle);
+		curr_throttle = value;
 		return true;
 	}
 
